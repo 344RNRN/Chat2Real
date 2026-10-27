@@ -1,39 +1,125 @@
-<%@ page pageEncoding="UTF-8" %>
-<%!
-    private static String h(Object value) {
-        if (value == null) {
-            return "";
-        }
-        String s = value.toString();
-        StringBuilder sb = new StringBuilder(s.length());
-        for (char c : s.toCharArray()) {
-            switch (c) {
-                case '&': sb.append("&amp;"); break;
-                case '<': sb.append("&lt;"); break;
-                case '>': sb.append("&gt;"); break;
-                case '"': sb.append("&quot;"); break;
-                case '\'': sb.append("&#39;"); break;
-                default: sb.append(c);
-            }
-        }
-        return sb.toString();
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<style>
+    .header {
+        width: 100%;
+        min-height: 85px;
+        padding: 0 4%;
+        box-sizing: border-box;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        background: #ffffff;
+        border-bottom: 1px solid #e8edf5;
+        box-shadow: 0 3px 15px rgba(32, 54, 83, 0.04);
     }
-%>
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chat2Real 運営</title>
-</head>
-<body>
-<header class="site-header">
-    <h1 class="site-logo"><a href="<%= request.getContextPath() %>/EventDashboard.action">Chat2Real 運営</a></h1>
-<% if (session.getAttribute("organizerName") != null) { %>
-    <p class="header-event"><%= h(session.getAttribute("eventName")) %></p>
-    <div class="header-menu">
-        <span>運営者：<%= h(session.getAttribute("organizerName")) %> さん</span>
-        <button type="button" id="logoutButton" name="logoutButton" class="btn-logout">ログアウト</button>
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }
+
+    .logo {
+        font-family: Georgia, serif;
+        font-size: 32px;
+        font-weight: bold;
+        color: #203653;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .logo span {
+        color: #f582ad;
+    }
+
+    .header-divider {
+        height: 32px;
+        border-left: 1px solid #cbd5e2;
+    }
+
+    .system-name {
+        margin: 0;
+        color: #203653;
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    .header-nav {
+        display: flex;
+        align-items: center;
+    }
+
+    .admin-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        padding: 12px 18px;
+
+        color: #ed477a;
+        background: #fff0f5;
+        border-radius: 10px;
+
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .admin-label span {
+        color: #f45c8b;
+    }
+
+    @media (max-width: 600px) {
+        .header {
+            padding: 18px 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 27px;
+        }
+
+        .system-name {
+            font-size: 14px;
+        }
+
+        .header-divider {
+            height: 25px;
+        }
+    }
+</style>
+
+<header class="header">
+
+    <div class="header-left">
+
+        <a href="${pageContext.request.contextPath}/admin/login.jsp"
+           class="logo">
+            Chat2<span>Real</span>
+        </a>
+
+        <div class="header-divider"></div>
+
+        <h1 class="system-name">
+            ～チャットからリアルな交流へ
+        </h1>
+
     </div>
-<% } %>
+
+    <nav class="header-nav">
+        <span class="admin-label">
+            <span>●</span> 運営者専用
+        </span>
+    </nav>
+
 </header>
