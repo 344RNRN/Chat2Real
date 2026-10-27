@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<Context>
+<Context reloadable="true">
     <Resource
         name="jdbc/chat2real"
         auth="Container"
@@ -8,6 +7,6 @@
         driverClassName="org.postgresql.Driver"
         url="jdbc:postgresql://localhost:5432/chat2real"
         username="postgres"
-        password="あなたのPostgreSQLのパスワード"
+        password="pass"
     />
 </Context>
