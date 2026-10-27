@@ -1,4 +1,33 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%!
+    private static String h(Object value) {
+        if (value == null) {
+            return "";
+        }
+        String s = value.toString();
+        StringBuilder sb = new StringBuilder(s.length());
+        for (char c : s.toCharArray()) {
+            switch (c) {
+                case '&': sb.append("&amp;"); break;
+                case '<': sb.append("&lt;"); break;
+                case '>': sb.append("&gt;"); break;
+                case '"': sb.append("&quot;"); break;
+                case '\'': sb.append("&#39;"); break;
+                default: sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+%>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>運営者アカウント作成 | Chat2Real</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/admin-register.css">
+</head>
+<body>
 <%@ include file="common/header.jsp" %>
 
 <main class="page">
@@ -40,9 +69,11 @@
             <button type="submit" name="createAccountButton" class="btn-primary">アカウントを作成</button>
         </form>
 
-        <p class="card-links"><a href="<%= request.getContextPath() %>/login.jsp">ログイン画面へ</a></p>
+        <p class="card-links"><a href="<%= request.getContextPath() %>/admin/adminLogin.jsp">ログイン画面へ</a></p>
         <p class="card-note">参加者の方は、会場のQRコードから入室してください。</p>
     </section>
 </main>
 
 <%@ include file="common/footer.jsp" %>
+</body>
+</html>
