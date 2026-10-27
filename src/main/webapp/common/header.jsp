@@ -1,6 +1,5 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" %>
+    pageEncoding="UTF-8"%>
 
 <style>
     .header {
@@ -118,7 +117,9 @@
     </div>
 
     <nav class="header-nav">
-        
+        <span class="admin-label">
+            <span>●</span> 運営者専用
+        </span>
     </nav>
 
 </header>
