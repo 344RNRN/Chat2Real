@@ -1,0 +1,193 @@
+/* アンケート結果画面（admin/surveyResult.jsp）のスタイル */
+* {
+    box-sizing: border-box;
+}
+
+/* ---------- 画面の中身 ---------- */
+.survey-page {
+    flex: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+    color: #203653;
+}
+
+/* ---------- タイトルと戻るボタン ---------- */
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    margin: 0 0 4px;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.page-sub {
+    margin: 0;
+    color: #71819a;
+    font-size: 14px;
+}
+
+.back-button {
+    padding: 10px 18px;
+    color: #203653;
+    background: #ffffff;
+    border: 1.5px solid #dce4ee;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    color: #f45c8b;
+    border-color: #f45c8b;
+}
+
+/* ---------- 集計値（3つのカード） ---------- */
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.kpi-card {
+    padding: 16px 20px;
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(37, 58, 94, 0.05);
+}
+
+.kpi-title {
+    display: block;
+    color: #71819a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.kpi-value {
+    display: block;
+    margin-top: 6px;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.kpi-value small {
+    margin-left: 2px;
+    color: #71819a;
+    font-size: 14px;
+}
+
+/* ---------- カード（内訳・回答一覧） ---------- */
+.card {
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(37, 58, 94, 0.05);
+}
+
+.card-title {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.card-sub {
+    margin: 0 0 14px;
+    color: #71819a;
+    font-size: 12px;
+}
+
+/* ---------- 横棒グラフ（満足度の内訳） ---------- */
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.bar-label {
+    width: 36px;
+    color: #f5a623;
+    font-weight: 700;
+}
+
+.bar-track {
+    flex: 1;
+    height: 20px;
+    background: #f1f4f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    background: linear-gradient(110deg, #ff7da7, #f34d7d);
+    border-radius: 10px;
+}
+
+.bar-value {
+    width: 32px;
+    text-align: right;
+    font-weight: 700;
+}
+
+/* ---------- 回答一覧の表 ---------- */
+.answer-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.answer-table th {
+    padding: 10px 12px;
+    color: #71819a;
+    background: #f7f9fd;
+    border-bottom: 1px solid #e8edf5;
+    font-size: 12px;
+    text-align: left;
+}
+
+.answer-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: top;
+}
+
+.answer-table td:nth-child(1),
+.answer-table td:nth-child(2) {
+    white-space: nowrap;
+}
+
+/* 回答が0件のときのメッセージ */
+.answer-table td.empty {
+    padding: 28px 12px;
+    color: #71819a;
+    text-align: center;
+}
+
+/* ---------- スマホ ---------- */
+@media (max-width: 768px) {
+    .page-head {
+        flex-direction: column;
+    }
+
+    .kpi-row {
+        grid-template-columns: 1fr;
+    }
+
+    .answer-table {
+        font-size: 13px;
+    }
+}
