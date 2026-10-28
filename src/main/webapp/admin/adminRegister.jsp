@@ -33,6 +33,10 @@
 <main class="page">
 
     <section class="card">
+        <div class="register-icon">
+            👤
+        </div>
+
         <h1 class="card-title">運営者アカウント作成</h1>
         <p class="card-lead">イベントの作成・管理を行う運営者のアカウントを作成します</p>
 

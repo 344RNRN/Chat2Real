@@ -18,6 +18,25 @@ body {
     justify-content: center;
     align-items: flex-start;
     padding: 48px 16px;
+
+    /* ログイン画面（admin-login.css の .main-container）と同じ背景 */
+    background:
+        radial-gradient(
+            circle at 0% 10%,
+            rgba(110, 163, 255, 0.10),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 100% 25%,
+            rgba(255, 135, 180, 0.13),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #f9fbff,
+            #ffffff 55%,
+            #fff7fa
+        );
 }
 .card {
     width: 100%;
@@ -90,4 +109,23 @@ body {
     color: #8B8579;
     font-size: 12px;
     text-align: center;
+}
+
+/* アイコン（ログイン画面の .lock-icon と同じデザイン） */
+.register-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #fff0f5,
+        #ffe6ef
+    );
+    border-radius: 50%;
+    font-size: 34px;
 }
