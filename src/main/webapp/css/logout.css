@@ -1,0 +1,190 @@
+/* ========================================
+   Chat2Real - 運営者ログアウト画面
+   ======================================== */
+
+:root {
+  --lo-navy: #173b63;
+  --lo-blue: #3b82f6;
+  --lo-pink: #f45b91;
+  --lo-text: #233b59;
+  --lo-muted: #7184a0;
+  --lo-border: #dce5f1;
+  --lo-white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--lo-text);
+  font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  background:
+    radial-gradient(circle at 6% 18%, rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+    radial-gradient(circle at 96% 20%, rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+    radial-gradient(circle at 88% 92%, rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+    linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+  background-attachment: fixed;
+}
+
+/* メイン領域 */
+.lo-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 78vh;
+  padding: 64px 24px;
+  isolation: isolate;
+  overflow: hidden;
+}v
+
+/* 背景のやわらかな円形装飾 */
+.lo-main::before,
+.lo-main::after {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  content: "";
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.lo-main::before {
+  top: 7%;
+  left: -48px;
+  width: 190px;
+  height: 190px;
+  background: rgba(225, 216, 250, 0.22);
+}
+
+.lo-main::after {
+  right: -62px;
+  bottom: 2%;
+  width: 230px;
+  height: 230px;
+  background: rgba(255, 213, 229, 0.25);
+}
+
+/* ログアウトカード */
+/* test   */
+.lo-card {
+  width: min(100%, 560px);
+  padding: 48px 44px 44px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(222, 231, 243, 0.9);
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(40, 66, 105, 0.10);
+  backdrop-filter: blur(12px);
+  animation: lo-appear 0.45s ease-out both;
+}
+
+.lo-title {
+  margin: 0 0 18px;
+  color: var(--lo-navy);
+  font-size: clamp(1.65rem, 4vw, 2rem);
+  font-weight: 800;
+  line-height: 1.45;
+  letter-spacing: 0.035em;
+}
+
+.lo-message {
+  margin: 0 0 32px;
+  color: var(--lo-muted);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+/* ログイン画面へ戻るボタン */
+.lo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 14px 28px;
+  color: var(--lo-white);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff83ad 0%, var(--lo-pink) 100%);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.lo-link:hover {
+  color: var(--lo-white);
+  filter: brightness(1.03);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(244, 91, 145, 0.30);
+}
+
+.lo-link:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 12px rgba(244, 91, 145, 0.20);
+}
+
+.lo-link:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.55);
+  outline-offset: 4px;
+}
+
+@keyframes lo-appear {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* スマートフォン対応 */
+@media (max-width: 600px) {
+  .lo-main {
+    min-height: 72vh;
+    padding: 36px 18px;
+  }
+
+  .lo-card {
+    padding: 36px 24px 30px;
+    border-radius: 20px;
+  }
+
+  .lo-title {
+    margin-bottom: 14px;
+  }
+
+  .lo-message {
+    margin-bottom: 26px;
+    font-size: 0.94rem;
+  }
+
+  .lo-link {
+    width: 100%;
+    padding: 13px 18px;
+  }
+}
+
+/* 動きを減らす設定が有効な場合 */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

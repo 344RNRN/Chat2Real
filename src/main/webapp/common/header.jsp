@@ -2,6 +2,26 @@
     pageEncoding="UTF-8"%>
 
 <style>
+	
+	html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #f7f9fc;
+        font-family: Arial, "Noto Sans JP", sans-serif;
+    }
+
+    main.page {
+        flex: 1;
+        width: 100%;
+        box-sizing: border-box;
+    }
     .header {
         width: 100%;
         min-height: 85px;

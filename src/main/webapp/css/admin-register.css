@@ -1,0 +1,131 @@
+/* 運営者アカウント作成画面（adminRegister.jsp）のスタイル */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #F7F4EF;
+    color: #211F1C;
+    font-family: "Meiryo UI", Meiryo, "Hiragino Sans", sans-serif;
+    font-size: 14px;
+}
+
+/* ---------- 画面の中身 ---------- */
+.page {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 16px;
+
+    /* ログイン画面（admin-login.css の .main-container）と同じ背景 */
+    background:
+        radial-gradient(
+            circle at 0% 10%,
+            rgba(110, 163, 255, 0.10),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 100% 25%,
+            rgba(255, 135, 180, 0.13),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #f9fbff,
+            #ffffff 55%,
+            #fff7fa
+        );
+}
+.card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 40px;
+    background: #FFFFFF;
+    border: 1px solid #BFB8AC;
+    border-radius: 6px;
+}
+.card-title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    text-align: center;
+}
+.card-lead {
+    margin: 0 0 24px;
+    color: #8B8579;
+    font-size: 12px;
+    text-align: center;
+}
+.form-item { margin-bottom: 16px; }
+.form-item label {
+    display: block;
+    margin-bottom: 6px;
+    color: #55504A;
+    font-weight: bold;
+    font-size: 13px;
+}
+.required { color: #C0392B; }
+.form-item input {
+    width: 100%;
+    max-width: 320px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #BFB8AC;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.form-item input:focus {
+    outline: 2px solid #E8873A;
+    border-color: #E8873A;
+}
+.error-message {
+    margin: 0 0 16px;
+    color: #C0392B;
+    font-weight: bold;
+    font-size: 13px;
+}
+.btn-primary {
+    width: 100%;
+    max-width: 320px;
+    height: 40px;
+    border: none;
+    border-radius: 4px;
+    background: #E8873A;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-primary:hover { background: #D67427; }
+.card-links {
+    margin: 20px 0 0;
+    text-align: center;
+    font-size: 13px;
+}
+.card-links a { color: #7A3E10; }
+.card-note {
+    margin: 16px 0 0;
+    color: #8B8579;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* アイコン（ログイン画面の .lock-icon と同じデザイン） */
+.register-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #fff0f5,
+        #ffe6ef
+    );
+    border-radius: 50%;
+    font-size: 34px;
+}
