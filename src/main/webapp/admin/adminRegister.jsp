@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/admin-register.css">
 </head>
 <body>
-<%@ include file="common/header.jsp" %>
+<%@ include file="/common/header.jsp" %>
 
 <main class="page">
 
@@ -74,6 +74,6 @@
     </section>
 </main>
 
-<%@ include file="common/footer.jsp" %>
+<%@ include file="/common/footer.jsp" %>
 </body>
 </html>

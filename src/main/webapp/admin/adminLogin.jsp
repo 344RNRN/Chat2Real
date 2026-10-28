@@ -176,7 +176,7 @@
                 </form>
 
                 <div class="login-footer">
-                	<a href="${pageContext.request.contextPath}/admin/register.jsp"
+                	<a href="${pageContext.request.contextPath}/admin/adminRegister.jsp"
 					   class="admin-register-link">
 					    ♙運営者アカウント登録へ
 					</a>
