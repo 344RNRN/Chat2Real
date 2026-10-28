@@ -38,7 +38,7 @@
      <!-- メインコンテンツ -->
     <main style="padding: 20px;">
 
-        <h2 style="font-size: 16px; margin: 0 0 20px;">
+        <h2 style="font-size: 32px; margin: 0 0 20px;">
             お知らせ配信
         </h2>
 
@@ -51,45 +51,48 @@
                       method="post"
                       enctype="multipart/form-data">
 
-                    <div class="form-row">
-                        <label class="form-label">配信先 ※</label>
+                    
+					<div class="form-row" style="display: flex; align-items: center;">
 
-                        <div class="form-content radio-options">
-                            <label>
-                                <input type="radio" name="target"
-                                       value="all" checked>
-                                参加者全員
-                            </label>
+    					<label class="form-label" style="width: 100px; flex-shrink: 0;">
+        					配信先 ※
+    					</label>
 
-                            <label>
-                                <input type="radio" name="target"
-                                       value="active">
-                                今は交流したくない人のみ
-                            </label>
-                        </div>
-                    </div>
+    					<div class="form-content radio-options"
+         					style="display: flex; align-items: center; gap: 20px;">
 
-                    <div class="form-row">
-                        <label for="template" class="form-label">
-                            テンプレート
-                        </label>
+        				<label style="white-space: nowrap;">
+            				<input type="radio" name="target" value="all" checked>
+            					参加者全員
+        					</label>
 
-                        <div class="form-content">
-                            <select id="template" name="template">
-                                <option value="">選択してください</option>
-                                <option value="交流タイムの案内">
-                                    交流タイムの案内
-                                </option>
-                                <option value="会場案内">
-                                    会場案内
-                                </option>
-                                <option value="イベント終了案内">
-                                    イベント終了案内
-                                </option>
-                            </select>
-                        </div>
-                    </div>
+        				<label style="white-space: nowrap;">
+            				<input type="radio" name="target" value="active">
+            					今は交流したくない人のみ
+        				</label>
 
+    				</div>
+				</div>
+
+
+                    <div class="form-row" style="display: flex; align-items: center;">
+
+    					<label for="template" class="form-label"
+           					style="width: 100px; flex-shrink: 0;">
+        					テンプレート
+    					</label>
+
+    					<div class="form-content" style="flex: 1;">
+    						<select id="template" name="template"
+            					style="width: 180px; box-sizing: border-box;">
+        					<option value="">選択してください</option>
+        					<option value="交流タイムの案内">交流タイムの案内</option>
+        					<option value="会場案内">会場案内</option>
+        					<option value="イベント終了案内">イベント終了案内</option>
+    						</select>
+						</div>
+
+					</div>
                     <div class="form-row">
                         <label for="message" class="form-label">
                             本文 ※
@@ -114,13 +117,13 @@
                     </div>
 
                     <div class="form-buttons">
-                        <button type="reset" class="cancel-button">
-                            キャンセル
-                        </button>
-
                         <button type="submit" class="send-button"
                                 onclick="return confirm('お知らせを配信しますか？');">
                             配信する
+                        </button>
+                        
+                        <button type="reset" class="cancel-button">
+                            キャンセル
                         </button>
                     </div>
 
