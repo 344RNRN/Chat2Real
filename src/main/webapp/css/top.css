@@ -1,0 +1,219 @@
+/* トップ画面（admin/topScreen.jsp）のスタイル　※参加者用（スマートフォン） */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f7f9fd;
+    color: #203653;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+}
+
+/* スマホの幅にそろえる（PCで見ても真ん中に表示される） */
+.app {
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #ffffff;
+}
+
+/* ---------- アプリバー ---------- */
+.app-bar {
+    padding: 14px 20px;
+    border-bottom: 1px solid #e8edf5;
+    text-align: center;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.app-sub {
+    min-height: 1em;
+    margin: 2px 0 0;
+    color: #71819a;
+    font-size: 12px;
+}
+
+/* ---------- 画面の中身 ---------- */
+.content {
+    flex: 1;
+    padding: 16px 20px 24px;
+}
+
+/* お知らせバナー */
+.notice-banner {
+    display: block;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    color: #c05c1d;
+    background: #fdf3e7;
+    border: 1px solid #f3d1a8;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* イベント情報 */
+.event-card {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f7f9fd;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+}
+
+.event-name {
+    min-height: 1em;
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.event-info {
+    margin: 4px 0 0;
+    color: #4b5b73;
+    font-size: 14px;
+}
+
+/* 見出し（今の気分・表示名） */
+.section-title {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* ---------- 今の気分（交流したい／今は交流したくない） ---------- */
+.mood-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mood-button {
+    width: 48%;
+    height: 60px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.mood-button:hover {
+    transform: translateY(-2px);
+}
+
+/* 交流したい（左のボタン）＝ブルー～パープル */
+.mood-button:first-child {
+    color: #5468d4;
+    background: #f0f2ff;
+    border-color: #c6cff9;
+}
+
+.mood-button:first-child.selected {
+    color: #ffffff;
+    background: linear-gradient(135deg, #5b8def, #8b6cf0);
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(110, 110, 240, 0.35);
+}
+
+/* 今は交流したくない（右のボタン）＝オレンジ～ピンク */
+.mood-button:last-child {
+    color: #e0662a;
+    background: #fff3ea;
+    border-color: #ffc9a3;
+}
+
+.mood-button:last-child.selected {
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff9a3d, #ff5f8f);
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(255, 95, 143, 0.35);
+}
+
+.mood-note {
+    margin: 12px 0 8px;
+    color: #71819a;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.current-status {
+    margin: 0 0 24px;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* 交流したい＝緑、今はしない＝灰色 */
+.status.want {
+    color: #ffffff;
+    background: #24b98a;
+}
+
+.status.not-now {
+    color: #ffffff;
+    background: #9aa5b5;
+}
+
+.status.none {
+    color: #71819a;
+    background: #eef2f7;
+}
+
+/* ---------- 表示名切り替え ---------- */
+.name-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.name-button {
+    flex: 1;
+    height: 42px;
+    color: #203653;
+    background: #ffffff;
+    border: 1.5px solid #dce4ee;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* 選んでいる名前は黒 */
+.name-button.selected {
+    color: #ffffff;
+    background: #211f1c;
+    border-color: #211f1c;
+}
+
+/* ---------- 下のリンク（イベント資料・退出） ---------- */
+.bottom-links {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid #e8edf5;
+    font-size: 14px;
+}
+
+.bottom-links a {
+    color: #203653;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.bottom-links .leave-link {
+    color: #c0392b;
+}
