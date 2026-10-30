@@ -60,8 +60,8 @@ public class NotificationDAO {
         List<NotificationBean> list = new ArrayList<>();
 
         String sql =
-                "SELECT notification_id, event_id, account_id, " +
-                "title, notification_text " +
+        		"SELECT notification_id, event_id, account_id, " +
+        		"title, notification_text, created_at " +
                 "FROM t013_notifications " +
                 "WHERE event_id = ? " +
                 "ORDER BY notification_id DESC";
@@ -92,6 +92,9 @@ public class NotificationDAO {
 
                     bean.setNotificationText(
                             rs.getString("notification_text"));
+                    
+                    bean.setCreatedAt(
+                    		rs.getTimestamp("created_at"));
 
                     list.add(bean);
                 }
@@ -99,5 +102,22 @@ public class NotificationDAO {
         }
 
         return list;
+    }
+ // お知らせを削除する
+    public boolean deleteNotification(long notificationId, long eventId)
+            throws SQLException {
+
+        String sql =
+                "DELETE FROM t013_notifications " +
+                "WHERE notification_id = ? AND event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, notificationId);
+            pstmt.setLong(2, eventId);
+
+            return pstmt.executeUpdate() > 0;
+        }
     }
 }

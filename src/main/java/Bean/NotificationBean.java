@@ -8,6 +8,7 @@ public class NotificationBean {
     private long accountId;
     private String title;
     private String notificationText;
+    private java.sql.Timestamp createdAt;
 
     public NotificationBean() {
     }
@@ -50,5 +51,12 @@ public class NotificationBean {
 
     public void setNotificationText(String notificationText) {
         this.notificationText = notificationText;
+    }
+    public java.sql.Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.sql.Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

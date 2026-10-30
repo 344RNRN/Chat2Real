@@ -463,3 +463,34 @@
         min-width: 350px;
     }
 }
+/* =========================
+   添付・削除ボタン
+========================= */
+
+.notice-history .attachment-delete {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.notice-history .attachment-delete form {
+    display: inline-block;
+    margin: 0;
+}
+
+.notice-history .delete-button {
+    display: inline-block;
+    padding: 5px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.notice-history .delete-button:hover {
+    background-color: #b02a37;
+}
