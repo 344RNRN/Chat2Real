@@ -71,16 +71,16 @@
                     class="login-form">
 
                     <div class="form-group">
-                        <label for="mailaddress">メールアドレス</label>
+                        <label for="loginID">ログインID</label>
 
                         <div class="input-wrapper">
          
 
                             <input
-                                type="email"
-                                id="mailaddress"
-                                name="mailaddress"
-                                placeholder="メールアドレスを入力"
+                                type="text"
+                                id="loginID"
+                                name="loginID"
+                                placeholder="ログインIDを入力してください"
                                 autocomplete="username"
                                 required>
                         </div>
@@ -96,7 +96,7 @@
                                 type="password"
                                 id="password"
                                 name="password"
-                                placeholder="パスワードを入力"
+                                placeholder="パスワードを入力してください"
                                 autocomplete="current-password"
                                 required>
 
@@ -110,7 +110,8 @@
                             </button>
                         </div>
                     </div>
-
+                    
+                    
 
                     <button type="submit" class="login-button">
                         <span class="button-icon">➜</span>
