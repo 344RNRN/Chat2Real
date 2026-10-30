@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,246 +11,222 @@
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/admin-login.css">
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/notice-post.css">
 </head>
+
 <body>
-	<%@ include file="/common/header.jsp" %>
-	<form action="${pageContext.request.contextPath}/LogoutAction"
-      method="post"
-      style="margin-left: 1110px; margin-right: 20px;"
-      onsubmit="return confirm('ログアウトしますか？');">
 
-    <button type="submit"
-            style="height: 48px;
-                   min-width: 110px;
-                   padding: 0 20px;
-                   font-size: 16px;
-                   font-weight: bold;
-                   color: white;
-                   background-color: #555;
-                   border: none;
-                   border-radius: 6px;
-                   cursor: pointer;">
-        ログアウト
-    </button>
+    <%@ include file="/common/header.jsp" %>
 
-</form>
-    		
-    
-     <!-- メインコンテンツ -->
-    <main style="padding: 20px; max-width: 1400px; margin: 0 auto; box-sizing: border-box;">
 
-        <h2 style="font-size: 32px; margin: 0 0 20px;">
-            お知らせ配信
-        </h2>
+    <!-- メインコンテンツ -->
+    <main class="notice-page">
 
-        <div class="notice-container"
-        	style="display: flex !important;
-            flex-direction: row !important;
-            justify-content: flex-start;
-            align-items: flex-start;
-            gap: 20px;
-            width: 100%;
-            box-sizing: border-box;">
+        <!-- タイトルとログアウトを同じ行に配置 -->
+        <div class="notice-page-header">
+
+            <h2 class="notice-page-title">
+                お知らせ配信
+            </h2>
+
+            <div class="logout-area">
+                <form action="${pageContext.request.contextPath}/LogoutAction"
+                      method="post"
+                      onsubmit="return confirm('ログアウトしますか？');">
+
+                    <button type="submit" class="notice-logout-btn">
+                        ログアウト
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- フォームと配信履歴 -->
+        <div class="notice-container">
 
             <!-- 左側：お知らせ入力フォーム -->
-            <section class="notice-form"
-             style="flex: 0 0 55%;
-                    width: 55%;
-                    min-width: 0;
-                    box-sizing: border-box;">
+            <section class="notice-form">
 
                 <form action="${pageContext.request.contextPath}/NoticePostAction"
-      				method="post">
-                      <!-- enctype="multipart/form-data-->
+                      method="post">
 
-                    
-					<div class="form-row"
-     					style="display: flex;
-            			align-items: center;
-            			margin-bottom: 20px;">
+                    <!-- 添付ファイルを送信する場合は multipart/form-data を指定 -->
 
-    					<label class="form-label" style="width: 100px; flex-shrink: 0;">
-        					配信先 ※
-    					</label>
+                    <!-- 配信先 -->
+                    <div class="form-row">
 
-    					<div class="form-content radio-options"
-         					style="display: flex; align-items: center; gap: 20px;">
+                        <label class="form-label">
+                            配信先 ※
+                        </label>
 
-        				<label style="white-space: nowrap;">
-            				<input type="radio" name="target" value="all" checked>
-            					参加者全員
-        					</label>
+                        <div class="form-content radio-options">
 
-        				<label style="white-space: nowrap;">
-            				<input type="radio" name="target" value="active">
-            					今は交流したくない人のみ
-        				</label>
+                            <label>
+                                <input type="radio"
+                                       name="target"
+                                       value="all"
+                                       checked>
+                                参加者全員
+                            </label>
 
-    				</div>
-				</div>
+                            <label>
+                                <input type="radio"
+                                       name="target"
+                                       value="active">
+                                今は交流したくない人のみ
+                            </label>
 
-					
+                        </div>
+                    </div>
+
                     <!-- テンプレート選択 -->
-				<div class="form-row"
-     				style="display: flex; align-items: center; margin-bottom: 20px;">
-    				<label for="template" class="form-label"
-           				style="width: 100px; flex-shrink: 0;">
-        				テンプレート
-    				</label>
+                    <div class="form-row">
 
-    				<div class="form-content" style="flex: 1;">
-        				<select id="template" name="template"
-                				style="width: 220px; box-sizing: border-box;">
-            				<option value="">選択してください（任意）</option>
-            				<option value="交流タイムの案内">交流タイムの案内</option>
-            				<option value="会場案内">会場案内</option>
-            				<option value="イベント終了案内">イベント終了案内</option>
-        				</select>
-    				</div>
-				</div>
+                        <label for="template" class="form-label">
+                            テンプレート
+                        </label>
 
-					<!-- タイトル入力 -->
-				<div class="form-row"
-     				style="display: flex; align-items: center; margin-bottom: 20px;">
-    				<label for="title" class="form-label"
-           				style="width: 100px; flex-shrink: 0;">
-        				タイトル ※
-    				</label>
+                        <div class="form-content">
 
-    				<div class="form-content" style="flex: 1;">
-        				<input type="text" id="title" name="title"
-               				maxlength="100" required
-               				placeholder="タイトルを入力してください"
-               				style="width: 100%; height: 38px; padding: 8px;
-                      		box-sizing: border-box;">
-    				</div>
-				</div>
+                            <select id="template" name="template">
+                                <option value="">選択してください（任意）</option>
+                                <option value="交流タイムの案内">交流タイムの案内</option>
+                                <option value="会場案内">会場案内</option>
+                                <option value="イベント終了案内">イベント終了案内</option>
+                            </select>
 
-				<script>
-    				const templateSelect = document.getElementById("template");
-    				const titleInput = document.getElementById("title");
+                        </div>
+                    </div>
 
-    				templateSelect.addEventListener("change", function () {
-        				if (this.value !== "") {
-            				titleInput.value = this.value;
-        				}
-    				});
-				</script>
+                    <!-- タイトル入力 -->
+                    <div class="form-row">
 
-					
-                    <div class="form-row"
-     					style="display: flex;
-            			align-items: center;
-            			margin-bottom: 20px;">
+                        <label for="title" class="form-label">
+                            タイトル ※
+                        </label>
 
-    					<label for="message" class="form-label"
-           					style="width: 100px; flex-shrink: 0;">
-        					本文 ※
-    					</label>
+                        <div class="form-content">
 
-    					<div class="form-content" style="flex: 1;">
-        					<textarea id="message" name="message"
-                  				required
-                  				placeholder="お知らせの内容を入力してください"
-                  				style="width: 100%;
-                         		height: 85px;
-                         		box-sizing: border-box;"></textarea>
-    					</div>
+                            <input type="text"
+                                   id="title"
+                                   name="title"
+                                   maxlength="100"
+                                   required
+                                   placeholder="タイトルを入力してください">
 
-					</div>
+                        </div>
+                    </div>
 
-                    <div class="form-row"
-     					style="display: flex;
-            			align-items: center;
-            			margin-bottom: 20px;">
+                    <!-- テンプレート選択時にタイトルを自動入力 -->
+                    <script>
+                        const templateSelect =
+                            document.getElementById("template");
 
-    					<label for="attachment" class="form-label"
-           					style="width: 100px; flex-shrink: 0;">
-        					添付
-    					</label>
+                        const titleInput =
+                            document.getElementById("title");
 
-    					<div class="form-content file-row"
-         					style="display: flex; align-items: center;">
-        					<input type="file"
-               					id="attachment"
-               					name="attachment"
-               					style="width: 250px;">
-    					</div>
+                        templateSelect.addEventListener("change", function () {
+                            if (this.value !== "") {
+                                titleInput.value = this.value;
+                            }
+                        });
+                    </script>
 
-					</div>
+                    <!-- 本文入力 -->
+                    <div class="form-row">
 
-                    <div class="form-buttons"
-     					style="margin-left: 100px;
-            			display: flex;
-            			gap: 10px;
-            			margin-top: 20px;">
-                        <button type="submit" class="send-button"
-        					style="background-color: #f28c28;
-               				color: white;
-               				font-size: 16px;
-               				padding: 12px 28px;
-               				min-width: 130px;
-               				min-height: 48px;
-               				border: none;
-               				border-radius: 6px;
-               				cursor: pointer;"
-        					onclick="return confirm('お知らせを配信しますか？');">
-    						配信する
-						</button>
-                        
+                        <label for="message" class="form-label">
+                            本文 ※
+                        </label>
+
+                        <div class="form-content">
+
+                            <textarea id="message"
+                                      name="message"
+                                      required
+                                      placeholder="お知らせの内容を入力してください"></textarea>
+
+                        </div>
+                    </div>
+
+                    <!-- 添付ファイル -->
+                    <div class="form-row">
+
+                        <label for="attachment" class="form-label">
+                            添付
+                        </label>
+
+                        <div class="form-content file-row">
+
+                            <input type="file"
+                                   id="attachment"
+                                   name="attachment">
+
+                        </div>
+                    </div>
+
+                    <!-- 配信・キャンセルボタン -->
+                    <div class="form-buttons">
+
+                        <button type="submit"
+                                class="send-button"
+                                onclick="return confirm('お知らせを配信しますか？');">
+                            配信する
+                        </button>
+
                         <button type="reset" class="cancel-button">
                             キャンセル
                         </button>
+
                     </div>
 
                 </form>
             </section>
 
             <!-- 右側：配信済みのお知らせ -->
-             <section class="notice-history"
-             style="flex: 1;
-                    min-width: 0;
-                    box-sizing: border-box;
-                    border: 1px solid #c5bdb5;
-                    padding: 16px;
-                    background-color: #fff;">
+            <section class="notice-history">
 
-        		<h3>配信済みのお知らせ</h3>
+                <h3>配信済みのお知らせ</h3>
 
-        		<table style="width: 100%; border-collapse: collapse;">
-            		<thead>
-                		<tr>
-                    		<th>時刻</th>
-                    		<th>内容</th>
-                    		<th>添付</th>
-                		</tr>
-            		</thead>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>時刻</th>
+                            <th>内容</th>
+                            <th>添付</th>
+                        </tr>
+                    </thead>
 
-            		<tbody>
-                		<tr>
-                    		<td>14:02</td>
-                    		<td>会場マップを更新しました</td>
-                    		<td>画像</td>
-                		</tr>
-                		<tr>
-                    		<td>13:30</td>
-                    		<td>イベントパンフレットを公開しました</td>
-                    		<td>PDF</td>
-                		</tr>
-                		<tr>
-                    		<td>13:10</td>
-                    		<td>20分後に交流タイムを開始します</td>
-                    		<td>－</td>
-                		</tr>
-            		</tbody>
-        		</table>
+                    <tbody>
+                        <tr>
+                            <td>14:02</td>
+                            <td>会場マップを更新しました</td>
+                            <td>画像</td>
+                        </tr>
 
-    		</section>
+                        <tr>
+                            <td>13:30</td>
+                            <td>イベントパンフレットを公開しました</td>
+                            <td>PDF</td>
+                        </tr>
 
-		</div>
+                        <tr>
+                            <td>13:10</td>
+                            <td>20分後に交流タイムを開始します</td>
+                            <td>－</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </section>
+
+        </div>
     </main>
 
     <%@ include file="/common/footer.jsp" %>
-    
+
 </body>
 </html>
