@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="Bean.NotificationBean" %>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -200,25 +202,66 @@
                         </tr>
                     </thead>
 
-                    <tbody>
-                        <tr>
-                            <td>14:02</td>
-                            <td>会場マップを更新しました</td>
-                            <td>画像</td>
-                        </tr>
+                    
+					<tbody>
+    					<%
+        					List<NotificationBean> notificationList =
+            				(List<NotificationBean>) request.getAttribute("notificationList");
 
-                        <tr>
-                            <td>13:30</td>
-                            <td>イベントパンフレットを公開しました</td>
-                            <td>PDF</td>
-                        </tr>
+        					if (notificationList != null && !notificationList.isEmpty()) {
+            					for (NotificationBean notification : notificationList) {
+    					%>
+        				<tr>
+    						<td>
+        						<%
+            						if (notification.getCreatedAt() != null) {
+                						out.print(
+                    						new java.text.SimpleDateFormat("HH:mm")
+                        					.format(notification.getCreatedAt())
+                						);
+            						}
+        						%>
+    						</td>
 
-                        <tr>
-                            <td>13:10</td>
-                            <td>20分後に交流タイムを開始します</td>
-                            <td>－</td>
-                        </tr>
-                    </tbody>
+    						<td>
+        						<strong>
+            						<%= escapeHtml(notification.getTitle()) %>
+        						</strong>
+        						<br>
+        							<%= escapeHtml(notification.getNotificationText()) %>
+   			 				</td>
+
+    						<td>
+    							<div class="attachment-delete">
+        							<span>－</span>
+
+        							<form action="${pageContext.request.contextPath}/NoticeDeleteAction"
+              							method="post"
+              							onsubmit="return confirm('このお知らせを削除しますか？');">
+
+            							<input type="hidden"
+                   							name="notificationId"
+                   							value="<%= notification.getNotificationId() %>">
+
+            								<button type="submit" class="delete-button">
+                								削除
+           									</button>
+        							</form>
+    							</div>
+							</td>
+						</tr>
+    					<%
+            					}
+        					} else {
+    					%>
+        					<tr>
+            					<td colspan="3">配信済みのお知らせはありません。</td>
+        					</tr>
+    					<%
+        					}
+    					%>
+					</tbody>
+
                 </table>
 
             </section>
@@ -229,4 +272,17 @@
     <%@ include file="/common/footer.jsp" %>
 
 </body>
+<%!
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#39;");
+    }
+%>
 </html>

@@ -2,34 +2,56 @@
 package admin;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
+import Bean.NotificationBean;
+import DAO.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/NoticePostAction")
 public class NoticePostAction extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // PostgreSQL接続設定
-    private static final String DB_URL =
-            "jdbc:postgresql://localhost:5432/chat2real";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASSWORD = "pass";
-
     @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // 開発用の仮イベントID
+        // 本番ではログインセッションから取得する
+        long eventId = 2L;
+
+        NotificationDAO dao = new NotificationDAO();
+
+        try {
+            // DBからお知らせ一覧を取得
+            List<NotificationBean> notificationList =
+                    dao.findByEventId(eventId);
+
+            // JSPに一覧を渡す
+            request.setAttribute("notificationList", notificationList);
+
+            // JSPを表示
+            request.getRequestDispatcher(
+                    "/admin/noticePost.jsp")
+                    .forward(request, response);
+
+        } catch (SQLException e) {
+            throw new ServletException(
+                    "お知らせ一覧の取得に失敗しました。", e);
+        }
+    }
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
-    	System.out.println("NoticePostActionが呼び出されました！");
+
+        System.out.println("NoticePostActionが呼び出されました！");
 
         request.setCharacterEncoding("UTF-8");
 
@@ -38,88 +60,65 @@ public class NoticePostAction extends HttpServlet {
         String message = request.getParameter("message");
 
         // 入力チェック
+     // 入力チェック① 空欄チェック
         if (title == null || title.trim().isEmpty()
                 || message == null || message.trim().isEmpty()) {
 
-            request.setAttribute("errorMessage",
-                    "タイトルと本文を入力してください。");
-
-            request.getRequestDispatcher("/notifiPost.jsp")
-                   .forward(request, response);
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/NoticePostAction?error=empty");
             return;
         }
 
+        // 前後の空白を削除
         title = title.trim();
         message = message.trim();
 
+        // 入力チェック② タイトルの文字数チェック
         if (title.length() > 100) {
-            request.setAttribute("errorMessage",
-                    "タイトルは100文字以内で入力してください。");
 
-            request.getRequestDispatcher("/notifiPost.jsp")
-                   .forward(request, response);
-            return;
-        }
-
-        // ログイン時に保存したセッション情報からIDを取得する
-        HttpSession session = request.getSession(false);
-
-        /*if (session == null
-                || session.getAttribute("event_id") == null
-                || session.getAttribute("account_id") == null) {
-
-            response.sendError(
-                    HttpServletResponse.SC_UNAUTHORIZED,
-                    "イベントまたは主催者のログイン情報がありません。");
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/NoticePostAction?error=length");
             return;
         }
         
-        long eventId;
-        long accountId;
 
-
-        try {
-            eventId = Long.parseLong(
-                    session.getAttribute("event_id").toString());
-            accountId = Long.parseLong(
-                    session.getAttribute("account_id").toString());
-        } catch (NumberFormatException e) {
-            response.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "ログイン情報のIDが不正です。");
-            return;
-        }
-        */
-        
-     // 開発用の仮ID。本番では必ずログイン情報から取得する
+        // 開発用の仮ID
+        // 本番ではログイン情報から取得する
         long eventId = 2L;
         long accountId = 1L;
 
-        String sql =
-                "INSERT INTO t013_notifications " +
-                "(event_id, account_id, title, notification_text) " +
-                "VALUES (?, ?, ?, ?)";
+        // Beanにデータを格納する
+        NotificationBean notification = new NotificationBean();
+
+        notification.setEventId(eventId);
+        notification.setAccountId(accountId);
+        notification.setTitle(title);
+        notification.setNotificationText(message);
+
+        // DAOを使ってDBに登録する
+        NotificationDAO dao = new NotificationDAO();
 
         try {
-            Class.forName("org.postgresql.Driver");
 
-            try (Connection conn = DriverManager.getConnection(
-                        DB_URL, DB_USER, DB_PASSWORD);
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            boolean result = dao.insertNotification(notification);
 
-                pstmt.setLong(1, eventId);
-                pstmt.setLong(2, accountId);
-                pstmt.setString(3, title);
-                pstmt.setString(4, message);
+            if (result) {
 
-                pstmt.executeUpdate();
+                // 登録成功
+            	response.sendRedirect(
+            	        request.getContextPath()
+            	        + "/NoticePostAction?success=1");
+
+            } else {
+
+                throw new ServletException(
+                        "お知らせを登録できませんでした。");
             }
 
-            // 登録後に画面へ戻る
-            response.sendRedirect(
-                    request.getContextPath() + "/admin/noticePost.jsp?success=1");
+        } catch (SQLException e) {
 
-        } catch (ClassNotFoundException | SQLException e) {
             throw new ServletException(
                     "お知らせの登録に失敗しました。", e);
         }
