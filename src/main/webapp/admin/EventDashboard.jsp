@@ -57,12 +57,13 @@
                     <p>2026/10/18 (日) 19:00〜21:00　みなとホール 3F</p>
                 </div>
 
+                <!-- 各ボタンにページ移動の命令（onclick）を組み込みました -->
                 <div class="action-buttons">
-                    <button type="button" class="btn">編集</button>
-                    <button type="button" class="btn">アンケート結果</button>
-                    <button type="button" class="btn">QRコード</button>
-                    <button type="button" class="btn btn-primary">お知らせ配信</button>
-                    <button type="button" class="btn btn-danger">イベント終了</button>
+                    <button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/admin/EventEdit.jsp'">編集</button>
+                    <button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/admin/SurveyResult.jsp'">アンケート結果</button>
+                    <button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/admin/QRCode.jsp'">QRコード</button>
+                    <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/admin/Notification.jsp'">お知らせ配信</button>
+                    <button type="button" class="btn btn-danger" onclick="location.href='${pageContext.request.contextPath}/admin/EventEnd.jsp'">イベント終了</button>
                 </div>
 
             </section>

@@ -1,219 +1,451 @@
-/* トップ画面（admin/topScreen.jsp）のスタイル　※参加者用（スマートフォン） */
-* {
+/* ========================================
+   Chat2Real - Top（イベントルーム）
+   admin/topScreen.jsp のスタイル
+   ※ 色・形は participant-list.css（参加者一覧）に合わせています
+   ======================================== */
+
+:root {
+    --primary-color: #ed7628;
+    --primary-hover: #d9651c;
+
+    --blue-color: #4a7fd6;
+    --blue-hover: #3c6dc0;
+
+    --text-primary: #292929;
+    --text-secondary: #737373;
+
+    --border-color: #e7e4e1;
+    --background-color: #f8f7f5;
+    --surface-color: #ffffff;
+
+    --radius-small: 6px;
+    --radius-medium: 10px;
+    --radius-large: 14px;
+
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+.top-page {
+    flex: 1;
+    width: min(100% - 48px, 760px);
+    margin: 0 auto;
+    padding: 36px 0 60px;
+
+    color: var(--text-primary);
+    font-family:
+        "Noto Sans JP",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-    background: #f7f9fd;
-    color: #203653;
-    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+.top-page *,
+.top-page *::before,
+.top-page *::after {
+    box-sizing: border-box;
 }
 
-/* スマホの幅にそろえる（PCで見ても真ん中に表示される） */
-.app {
-    display: flex;
-    flex-direction: column;
-    max-width: 480px;
-    min-height: 100vh;
-    margin: 0 auto;
-    background: #ffffff;
-}
-
-/* ---------- アプリバー ---------- */
-.app-bar {
-    padding: 14px 20px;
-    border-bottom: 1px solid #e8edf5;
-    text-align: center;
-}
-
-.app-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-}
-
-.app-sub {
-    min-height: 1em;
-    margin: 2px 0 0;
-    color: #71819a;
-    font-size: 12px;
-}
-
-/* ---------- 画面の中身 ---------- */
-.content {
-    flex: 1;
-    padding: 16px 20px 24px;
-}
-
-/* お知らせバナー */
-.notice-banner {
-    display: block;
-    margin-bottom: 16px;
-    padding: 12px 14px;
-    color: #c05c1d;
-    background: #fdf3e7;
-    border: 1px solid #f3d1a8;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
+.top-page a {
     text-decoration: none;
 }
 
-/* イベント情報 */
+
+/* ========================================
+   Page Heading（イベントルーム）
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 24px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+
+    color: var(--primary-color);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.page-heading h1 {
+    margin: 0;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.page-description {
+    min-height: 1em;
+    margin: 8px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* ========================================
+   1. お知らせバナー
+   ======================================== */
+
+.notice-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 14px 18px;
+
+    color: #75543d;
+    background: #fff1e6;
+
+    border: 1px solid #edc4a5;
+    border-radius: var(--radius-medium);
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.6;
+
+    transition: border-color 0.2s;
+}
+
+.notice-banner:hover {
+    border-color: var(--primary-color);
+}
+
+.notice-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+
+    color: #ffffff;
+    background: var(--primary-color);
+
+    border-radius: 50%;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   2～5. イベント情報
+   ======================================== */
+
 .event-card {
     margin-bottom: 20px;
-    padding: 16px;
-    background: #f7f9fd;
-    border: 1px solid #e8edf5;
-    border-radius: 14px;
+    padding: 22px 24px;
+
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-card);
 }
 
 .event-name {
     min-height: 1em;
-    margin: 0 0 8px;
+    margin: 0 0 10px;
+
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
+    line-height: 1.5;
 }
 
 .event-info {
     margin: 4px 0 0;
-    color: #4b5b73;
-    font-size: 14px;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.8;
 }
 
-/* 見出し（今の気分・表示名） */
+
+/* ========================================
+   6～10. 白いパネル（今の気分・表示名）
+   ======================================== */
+
+.mood,
+.name-switch {
+    margin-bottom: 20px;
+    padding: 24px;
+
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-card);
+}
+
 .section-title {
-    margin: 0 0 10px;
-    font-size: 15px;
+    margin: 0 0 12px;
+
+    font-size: 14px;
     font-weight: 700;
 }
 
-/* ---------- 今の気分（交流したい／今は交流したくない） ---------- */
+
+/* ========================================
+   6, 7. 今の気分ボタン
+   ======================================== */
+
 .mood-buttons {
     display: flex;
-    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
 }
 
 .mood-button {
-    width: 48%;
-    height: 60px;
-    border: 2px solid transparent;
-    border-radius: 14px;
+    flex: 1;
+    min-height: 56px;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-medium);
+
+    font-family: inherit;
     font-size: 15px;
     font-weight: 700;
+
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .mood-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
-/* 交流したい（左のボタン）＝ブルー～パープル */
+/* 交流したい（左のボタン）＝ブルー */
 .mood-button:first-child {
-    color: #5468d4;
-    background: #f0f2ff;
-    border-color: #c6cff9;
+    color: var(--blue-color);
+    background: #eef3fc;
+    border-color: #c9d8f2;
 }
 
 .mood-button:first-child.selected {
     color: #ffffff;
-    background: linear-gradient(135deg, #5b8def, #8b6cf0);
-    border-color: transparent;
-    box-shadow: 0 6px 16px rgba(110, 110, 240, 0.35);
+    background: var(--blue-color);
+    border-color: var(--blue-color);
 }
 
-/* 今は交流したくない（右のボタン）＝オレンジ～ピンク */
+.mood-button:first-child.selected:hover {
+    background: var(--blue-hover);
+}
+
+/* 今は交流したくない（右のボタン）＝オレンジ */
 .mood-button:last-child {
-    color: #e0662a;
-    background: #fff3ea;
-    border-color: #ffc9a3;
+    color: var(--primary-hover);
+    background: #fff1e6;
+    border-color: #edc4a5;
 }
 
 .mood-button:last-child.selected {
     color: #ffffff;
-    background: linear-gradient(135deg, #ff9a3d, #ff5f8f);
-    border-color: transparent;
-    box-shadow: 0 6px 16px rgba(255, 95, 143, 0.35);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
+.mood-button:last-child.selected:hover {
+    background: var(--primary-hover);
+}
+
+
+/* ========================================
+   8, 9. 説明文・現在の状態
+   ======================================== */
+
 .mood-note {
-    margin: 12px 0 8px;
-    color: #71819a;
+    margin: 14px 0 12px;
+
+    color: var(--text-secondary);
     font-size: 12px;
-    line-height: 1.7;
+    line-height: 1.8;
 }
 
 .current-status {
-    margin: 0 0 24px;
-    font-size: 13px;
-}
+    margin: 0;
+    padding-top: 14px;
 
-.status {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
+    border-top: 1px solid #f0eeeb;
+
+    color: var(--text-secondary);
     font-size: 12px;
     font-weight: 700;
 }
 
-/* 交流したい＝緑、今はしない＝灰色 */
+.status {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 26px;
+    padding: 5px 11px;
+
+    border-radius: 4px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ボタンと同じ色 */
 .status.want {
-    color: #ffffff;
-    background: #24b98a;
+    color: var(--blue-color);
+    background: #eef3fc;
 }
 
 .status.not-now {
-    color: #ffffff;
-    background: #9aa5b5;
+    color: #75543d;
+    background: #f8e8d9;
 }
 
 .status.none {
-    color: #71819a;
-    background: #eef2f7;
+    color: var(--text-secondary);
+    background: #f0eeeb;
 }
 
-/* ---------- 表示名切り替え ---------- */
+
+/* ========================================
+   10. 表示名切り替え
+   ======================================== */
+
 .name-buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
+    margin: 0;
 }
 
 .name-button {
     flex: 1;
     height: 42px;
-    color: #203653;
+
+    color: var(--text-primary);
     background: #ffffff;
-    border: 1.5px solid #dce4ee;
-    border-radius: 10px;
+
+    border: 1px solid #dcd8d3;
+    border-radius: var(--radius-small);
+
+    font-family: inherit;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
+
     cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.name-button:hover {
+    border-color: var(--primary-color);
 }
 
 /* 選んでいる名前は黒 */
 .name-button.selected {
     color: #ffffff;
-    background: #211f1c;
-    border-color: #211f1c;
+    background: var(--text-primary);
+    border-color: var(--text-primary);
 }
 
-/* ---------- 下のリンク（イベント資料・退出） ---------- */
+
+/* ========================================
+   11. イベント資料・退出
+   ======================================== */
+
 .bottom-links {
     display: flex;
-    justify-content: space-between;
-    padding: 14px 20px;
-    border-top: 1px solid #e8edf5;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 32px;
+}
+
+.materials-link,
+.leave-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 14px 18px;
+
+    border-radius: var(--radius-small);
+
     font-size: 14px;
+    font-weight: 600;
+
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.bottom-links a {
-    color: #203653;
-    font-weight: 700;
-    text-decoration: none;
+.materials-link {
+    color: var(--text-primary);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
 }
 
-.bottom-links .leave-link {
+.materials-link:hover {
+    background: #fff1e6;
+    border-color: var(--primary-color);
+}
+
+.link-arrow {
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.leave-link {
     color: #c0392b;
+    background: #ffffff;
+    border: 1px solid #f0c9c4;
+}
+
+.leave-link:hover {
+    background: #fdeeec;
+    border-color: #c0392b;
+}
+
+
+/* ========================================
+   Responsive Design（スマートフォン）
+   ======================================== */
+
+@media (max-width: 700px) {
+
+    .top-page {
+        width: calc(100% - 32px);
+        padding: 26px 0 40px;
+    }
+
+    .page-heading h1 {
+        font-size: 24px;
+    }
+
+    .event-card,
+    .mood,
+    .name-switch {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .top-page {
+        width: calc(100% - 24px);
+    }
+
+    .mood-buttons {
+        gap: 8px;
+    }
+
+    .mood-button {
+        font-size: 13px;
+    }
 }
