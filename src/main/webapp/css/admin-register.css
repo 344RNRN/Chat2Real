@@ -961,3 +961,93 @@ body {
         gap: 2px;
     }
 }
+
+/* =========================
+   アカウント作成完了画面（adminRegisterComplete.jsp）
+========================= */
+
+.complete-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--pink), #ff8a65);
+    border-radius: 50%;
+
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.complete-message {
+    margin-bottom: 18px;
+
+    color: var(--text-gray);
+    font-size: 14px;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.complete-info {
+    margin: 0 0 6px;
+    padding: 14px 18px;
+
+    background: #f7f9fd;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.complete-info dt {
+    color: var(--text-gray);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.complete-info dd {
+    margin: 2px 0 10px;
+
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.complete-info dd:last-child {
+    margin-bottom: 0;
+}
+
+/* <a> を login-button と同じ見た目にする */
+.complete-button {
+    text-decoration: none;
+}
+
+@media (max-height: 800px) {
+
+    .complete-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 8px;
+        font-size: 24px;
+    }
+
+    .complete-message {
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    .complete-info {
+        padding: 10px 14px;
+    }
+}
+
+/* スマホ幅（1列表示）のときは、カードの右の余白をなくして画面からはみ出さないようにする */
+@media (max-width: 768px) {
+
+    .login-section {
+        margin-right: 0;
+    }
+}

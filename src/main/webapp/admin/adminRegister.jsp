@@ -101,7 +101,7 @@
             </div>
 <% } %>
 
-            <form action="<%= request.getContextPath() %>/AdminRegister.action" method="post" class="login-form">
+            <form action="<%= request.getContextPath() %>/admin/register" method="post" class="login-form">
 
                 <div class="form-group">
                     <label for="organizerName">運営者名（団体名） ※</label>
@@ -115,7 +115,7 @@
                 <div class="form-group">
                     <label for="email">メールアドレス ※</label>
                     <div class="input-wrapper">
-                        <input type="email" id="email" name="email" required autocomplete="email"
+                        <input type="email" id="email" name="email" maxlength="50" required autocomplete="email"
                                placeholder="メールアドレスを入力"
                                value="<%= h(request.getParameter("email")) %>">
                     </div>
