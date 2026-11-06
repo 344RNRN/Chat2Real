@@ -1,0 +1,541 @@
+/*
+ * Chat2Real - 終了レポート（アンケート）画面
+ * File: src/main/webapp/css/event-report.css
+ * デザインは admin-login.css（運営者ログイン）に合わせています
+ */
+
+/* ---------- CSS Variables（ログイン画面と同じ） ---------- */
+:root {
+    --navy: #173b63;
+    --blue: #3b82f6;
+    --pink: #f45b91;
+    --pink-soft: #fff0f6;
+    --text: #233b59;
+    --muted: #7184a0;
+    --border: #dce5f1;
+    --white: #ffffff;
+    --star-off: #dce5f1;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    overflow-x: hidden;
+
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+
+    /* ログイン画面と同じ背景（パステルの丸＋グラデーション） */
+    background:
+        radial-gradient(circle at 6% 18%,
+            rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%,
+            rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%,
+            rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+/* ---------- Main ---------- */
+.report-page {
+    position: relative;
+    isolation: isolate;
+
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+}
+
+/* 飾りの丸（ログイン画面の .main-container と同じ） */
+.report-page::before,
+.report-page::after {
+    position: absolute;
+    z-index: -1;
+    content: "";
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.report-page::before {
+    top: 4%;
+    left: -90px;
+    width: 190px;
+    height: 190px;
+    background: rgba(225, 216, 250, 0.22);
+}
+
+.report-page::after {
+    right: -100px;
+    bottom: 6%;
+    width: 230px;
+    height: 230px;
+    background: rgba(255, 213, 229, 0.25);
+}
+
+/* ---------- 見出し ---------- */
+.page-heading {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    padding: 7px 16px;
+
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-radius: 13px;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.page-heading h1 {
+    margin: 12px 0 4px;
+    color: var(--navy);
+    font-size: clamp(25px, 4vw, 30px);
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: 0.035em;
+}
+
+.page-description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* ---------- 共通カード（.login-card と同じ見た目） ---------- */
+.result-card,
+.survey-card {
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 32px 32px 28px;
+
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(222, 231, 243, 0.9);
+    border-radius: 22px;
+    box-shadow: 0 18px 50px rgba(40, 66, 105, 0.10);
+
+    animation: card-appear 0.4s ease-out both;
+}
+
+.survey-card {
+    animation-delay: 0.08s;
+}
+
+/* ---------- 1・2. 交流人数 ---------- */
+.result-card {
+    text-align: center;
+}
+
+.result-number {
+    margin: 0;
+
+    /* ピンクのグラデーション文字（ログインボタンと同じ色） */
+    background: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.result-unit {
+    margin-left: 4px;
+    font-size: 30px;
+}
+
+.result-text {
+    margin: 10px 0 0;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.8;
+}
+
+/* ---------- フォーム（.form-group / input はログイン画面と同じ） ---------- */
+.survey-form {
+    width: 100%;
+    margin: 0;
+}
+
+.form-group {
+    width: 100%;
+    margin: 0 0 21px;
+}
+
+.form-group label,
+.rating-group legend {
+    display: block;
+    margin: 0 0 9px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.required::after {
+    content: " ※";
+    color: var(--pink);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    color: var(--text);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+
+    font-family: inherit;
+    font-size: 16px;   /* 16px以上でiPhoneの自動拡大を防ぐ */
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"] {
+    height: 56px;
+    padding: 0 15px;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    padding: 14px 15px;
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #a2afc1;
+    opacity: 1;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    border-color: #8db5f0;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.09);
+}
+
+/* ---------- 選択式の質問（イベント作成画面で設定した選択肢） ---------- */
+.choice-group {
+    border: none;
+    padding: 0;
+    min-width: 0;
+}
+
+.choice-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.choice {
+    position: relative;
+    cursor: pointer;
+}
+
+.choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.choice span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 16px;
+
+    color: var(--text);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+
+    font-size: 14px;
+    transition: all 0.15s ease;
+}
+
+.choice:hover span {
+    border-color: #f9b6cd;
+}
+
+.choice input:checked + span {
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-color: #ff9cbd;
+    font-weight: 700;
+}
+
+.choice input:checked + span::before {
+    content: "✓";
+    margin-right: 6px;
+}
+
+.choice input:focus-visible + span {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+/* ---------- 10. 星評価 ---------- */
+.rating-group {
+    margin-top: 6px;
+    padding: 18px 12px 14px;
+
+    background: #f8faff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.rating-group legend {
+    float: left;          /* legend を枠の内側に入れる */
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.star-rating {
+    clear: both;
+    display: inline-flex;
+    flex-direction: row-reverse;   /* 選んだ星より左を全部光らせるため */
+    gap: 8px;
+}
+
+.star-rating input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.star-rating label {
+    margin: 0;
+    color: var(--star-off);
+    font-size: 40px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: var(--pink);
+}
+
+.star-rating label:hover {
+    transform: scale(1.12);
+}
+
+.star-rating input:focus-visible + label {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.rating-hint {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* ---------- 11. 送信ボタン（.login-button と同じ） ---------- */
+.submit-button {
+    width: 100%;
+    min-height: 58px;
+    margin: 8px 0 0;
+    padding: 14px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+    background: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    border: none;
+    border-radius: 11px;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.20);
+
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.submit-button:hover {
+    filter: brightness(1.03);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(244, 91, 145, 0.28);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 12px rgba(244, 91, 145, 0.20);
+}
+
+.submit-button:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.55);
+    outline-offset: 4px;
+}
+
+/* ---------- エラー（ログイン画面と同じ） ---------- */
+.error-message {
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 12px 15px;
+
+    color: #c62828;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 10px;
+
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- 回答済み ---------- */
+.done-card {
+    text-align: center;
+}
+
+.done-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--pink);
+    background: linear-gradient(135deg, #fff0f6 0%, #ffe3ee 100%);
+    border-radius: 50%;
+
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.done-title {
+    margin: 0;
+    color: var(--navy);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.done-text {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* ---------- 12. 終了のお知らせ ---------- */
+.closing-note {
+    padding: 14px 16px;
+
+    background: #f0f4ff;
+    border-radius: 12px;
+
+    animation: card-appear 0.4s ease-out 0.16s both;
+}
+
+.closing-note p {
+    margin: 0;
+    color: #40516e;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ---------- Animation ---------- */
+@keyframes card-appear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 700px) {
+    .report-page {
+        padding: 24px 16px 32px;
+    }
+
+    .result-card,
+    .survey-card {
+        padding: 28px 22px 24px;
+        border-radius: 20px;
+    }
+
+    .result-number {
+        font-size: 56px;
+    }
+
+    .page-heading h1 {
+        font-size: 26px;
+    }
+
+    .form-group input[type="text"] {
+        height: 53px;
+    }
+
+    .submit-button {
+        min-height: 55px;
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 400px) {
+    .result-card,
+    .survey-card {
+        padding: 24px 16px;
+    }
+
+    .page-heading h1 {
+        font-size: 24px;
+    }
+
+    .star-rating {
+        gap: 4px;
+    }
+
+    .star-rating label {
+        font-size: 36px;
+    }
+}
+
+/* ---------- Accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

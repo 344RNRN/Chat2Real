@@ -130,6 +130,8 @@
                             <input type="password" id="password" name="password" minlength="8" required
                                    pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" autocomplete="new-password"
                                    placeholder="英字と数字を含む8文字以上">
+                            <button type="button" class="password-toggle" data-target="password"
+                                    aria-label="パスワードを表示">表示</button>
                         </div>
                     </div>
 
@@ -139,6 +141,8 @@
                             <input type="password" id="passwordConfirm" name="passwordConfirm" minlength="8" required
                                    autocomplete="new-password"
                                    placeholder="もう一度パスワードを入力">
+                            <button type="button" class="password-toggle" data-target="passwordConfirm"
+                                    aria-label="パスワードを表示">表示</button>
                         </div>
                     </div>
 
@@ -162,4 +166,24 @@
 </main>
 
 <%@ include file="/common/footer.jsp" %>
+
+
+
+<!-- Password Visibility（パスワード・確認の両方） -->
+<script>
+    document.querySelectorAll(".password-toggle").forEach(function (button) {
+        const input = document.getElementById(button.dataset.target);
+        if (!input) return;
+
+        button.addEventListener("click", function () {
+            const isPassword = input.type === "password";
+
+            input.type = isPassword ? "text" : "password";
+            input.classList.toggle("is-visible", isPassword);
+            button.textContent = isPassword ? "非表示" : "表示";
+            button.setAttribute("aria-label",
+                isPassword ? "パスワードを隠す" : "パスワードを表示");
+        });
+    });
+</script>
 

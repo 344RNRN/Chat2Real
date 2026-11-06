@@ -1,0 +1,603 @@
+/*
+ * Chat2Real - イベント作成画面
+ * File: src/main/webapp/css/event-create.css
+ * デザインは admin-login.css（運営者ログイン）に合わせています
+ */
+
+/* ---------- CSS Variables（ログイン画面と同じ） ---------- */
+:root {
+    --navy: #173b63;
+    --blue: #3b82f6;
+    --pink: #f45b91;
+    --pink-soft: #fff0f6;
+    --text: #233b59;
+    --muted: #7184a0;
+    --border: #dce5f1;
+    --white: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+
+    background:
+        radial-gradient(circle at 6% 18%,
+            rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%,
+            rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%,
+            rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ---------- Page ---------- */
+.create-page {
+    width: min(1200px, 94%);
+    margin: 0 auto;
+    padding: 28px 0 44px;
+}
+
+/* ---------- 1. タイトル行 ---------- */
+.create-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-radius: 13px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.create-title {
+    margin: 10px 0 0;
+    color: var(--navy);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 800;
+    letter-spacing: 0.035em;
+}
+
+.operator {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.operator strong {
+    color: var(--navy);
+}
+
+.operator form {
+    margin: 0;
+}
+
+.logout-button {
+    padding: 9px 18px;
+    color: var(--navy);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-button:hover {
+    color: var(--pink);
+    border-color: #f9b6cd;
+}
+
+/* ---------- エラー ---------- */
+.error-message {
+    margin: 0 0 20px;
+    padding: 12px 15px;
+    color: #c62828;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- 2カラム ---------- */
+.create-form {
+    margin: 0;
+}
+
+.create-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* ---------- カード（.login-card と同じ） ---------- */
+.card {
+    padding: 30px 32px 28px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(222, 231, 243, 0.9);
+    border-radius: 22px;
+    box-shadow: 0 18px 50px rgba(40, 66, 105, 0.10);
+    animation: card-appear 0.4s ease-out both;
+}
+
+.card + .card {
+    animation-delay: 0.08s;
+}
+
+.card-title {
+    margin: 0 0 22px;
+    padding-left: 12px;
+    border-left: 4px solid var(--pink);
+    color: var(--navy);
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.card-sub {
+    margin: -12px 0 20px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.card-note {
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* ---------- フォーム行（ラベル左・入力右） ---------- */
+.form-row {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 18px;
+}
+
+.form-label {
+    padding-top: 13px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.required::after {
+    content: " ※";
+    color: var(--pink);
+}
+
+/* 入力欄（ログイン画面の input と同じ） */
+.create-page input[type="text"],
+.create-page input[type="date"],
+.create-page input[type="time"],
+.create-page input[type="number"],
+.create-page textarea {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    padding: 10px 14px;
+
+    color: var(--text);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.create-page textarea {
+    min-height: 110px;
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.create-page input::placeholder,
+.create-page textarea::placeholder {
+    color: #a2afc1;
+    opacity: 1;
+}
+
+.create-page input:focus,
+.create-page textarea:focus {
+    border-color: #8db5f0;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.09);
+}
+
+.create-page input[readonly] {
+    background: #f8faff;
+    cursor: default;
+}
+
+/* 3・4. 日付・時間 */
+.date-time {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.date-time input[type="date"] {
+    flex: 1 1 170px;
+}
+
+.time-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 230px;
+}
+
+.time-range span {
+    color: var(--muted);
+}
+
+/* 6. 定員 */
+.capacity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.capacity input {
+    max-width: 140px;
+}
+
+.capacity span {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* ---------- 小さいボタン（参照・追加） ---------- */
+.sub-button {
+    flex-shrink: 0;
+    min-height: 48px;
+    padding: 0 20px;
+    color: var(--navy);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.sub-button:hover {
+    color: var(--pink);
+    border-color: #f9b6cd;
+    background: var(--pink-soft);
+}
+
+/* 8・9. 資料 */
+.file-picker {
+    display: flex;
+    gap: 10px;
+}
+
+/* ---------- 10・11. 興味タグ ---------- */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 6px;
+}
+
+.tag {
+    position: relative;
+    cursor: pointer;
+}
+
+.tag input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tag span {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    color: var(--text);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    font-size: 13px;
+    transition: all 0.15s ease;
+}
+
+.tag:hover span {
+    border-color: #f9b6cd;
+}
+
+.tag input:checked + span {
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-color: #ff9cbd;
+    font-weight: 700;
+}
+
+.tag input:checked + span::before {
+    content: "✓";
+    margin-right: 6px;
+}
+
+.tag input:focus-visible + span {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+.tag-add-button {
+    padding: 8px 15px;
+    color: var(--pink);
+    background: transparent;
+    border: 1px dashed #f9a8c5;
+    border-radius: 22px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tag-add-button:hover {
+    background: var(--pink-soft);
+}
+
+.tag-input {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+/* ---------- 12~17. 質問ブロック ---------- */
+.question-block {
+    margin-bottom: 16px;
+    padding: 18px 18px 14px;
+    background: #f8faff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    animation: card-appear 0.25s ease-out both;
+}
+
+.question-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.question-number {
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.delete-button {
+    padding: 6px 14px;
+    color: #c62828;
+    background: var(--white);
+    border: 1px solid #fecdd3;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: #fff1f2;
+}
+
+.question-type,
+.choices-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.choices-row input {
+    flex: 1 1 200px;
+}
+
+.mini-label {
+    width: 64px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.question-type label,
+.required-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.required-check {
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.question-block input[type="radio"],
+.question-block input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--pink);
+}
+
+/* 18. 質問を追加 */
+.add-question-button {
+    width: 100%;
+    min-height: 50px;
+    color: var(--pink);
+    background: var(--white);
+    border: 1px dashed #f9a8c5;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.add-question-button:hover:not(:disabled) {
+    background: var(--pink-soft);
+}
+
+.add-question-button:disabled {
+    color: #a2afc1;
+    border-color: var(--border);
+    cursor: not-allowed;
+}
+
+/* ---------- 19・20. キャンセル・作成 ---------- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    margin-top: 26px;
+}
+
+.cancel-button,
+.create-button {
+    min-width: 200px;
+    min-height: 58px;
+    padding: 14px 26px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.cancel-button {
+    color: var(--navy);
+    background: var(--white);
+    border: 1px solid var(--border);
+}
+
+.cancel-button:hover {
+    border-color: #b9c7da;
+}
+
+/* .login-button と同じ */
+.create-button {
+    color: #ffffff;
+    background: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    border: none;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.20);
+}
+
+.create-button:hover {
+    filter: brightness(1.03);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(244, 91, 145, 0.28);
+}
+
+.create-button:active {
+    transform: translateY(0);
+}
+
+.create-button:focus-visible,
+.cancel-button:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.55);
+    outline-offset: 4px;
+}
+
+/* ---------- Animation ---------- */
+@keyframes card-appear {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 960px) {
+    .create-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    .create-page {
+        width: 92%;
+        padding-top: 20px;
+    }
+
+    .card {
+        padding: 24px 18px;
+        border-radius: 18px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .form-label {
+        padding-top: 0;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancel-button,
+    .create-button {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
