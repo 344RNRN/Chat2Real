@@ -130,7 +130,10 @@
                             <input type="password" id="password" name="password" minlength="8" required
                                    pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" autocomplete="new-password"
                                    placeholder="英字と数字を含む8文字以上">
-                            <button type="button" class="password-toggle" data-target="password"
+
+                            <!-- パスワードの表示／非表示（ログイン画面と同じ） -->
+                            <button type="button" class="password-toggle" id="togglePassword"
+
                                     aria-label="パスワードを表示">表示</button>
                         </div>
                     </div>
@@ -167,6 +170,7 @@
 
 <%@ include file="/common/footer.jsp" %>
 
+<<<<<<< HEAD
 
 
 <!-- Password Visibility（パスワード・確認の両方） -->
@@ -186,4 +190,25 @@
         });
     });
 </script>
+=======
+<script>
+    const passwordInput = document.getElementById("password");
+    const toggleButton = document.getElementById("togglePassword");
+
+    toggleButton.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+
+        passwordInput.type = isPassword ? "text" : "password";
+        toggleButton.textContent = isPassword ? "非表示" : "表示";
+
+        toggleButton.setAttribute(
+            "aria-label",
+            isPassword ? "パスワードを隠す" : "パスワードを表示"
+        );
+    });
+</script>
+
+</body>
+</html>
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 

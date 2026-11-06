@@ -26,7 +26,7 @@ public class AdminRegisterAction extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final String JSP = "/admin/adminRegister.jsp";
-    private static final String LOGIN = "/admin/adminLogin.jsp";
+    private static final String COMPLETE  = "/admin/adminRegisterComplete.jsp";
 
     /** JSP の maxlength と同じ */
     private static final int MAX_NAME = 50;
@@ -94,7 +94,7 @@ public class AdminRegisterAction extends HttpServlet {
         }
 
         // ---------- 4. ログイン画面へ（再読み込みで二重登録しないようにリダイレクト） ----------
-        response.sendRedirect(request.getContextPath() + LOGIN);
+        response.sendRedirect(request.getContextPath() + COMPLETE);
     }
 
     // =========================================================
