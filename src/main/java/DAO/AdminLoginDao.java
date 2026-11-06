@@ -1,5 +1,5 @@
 
-package dao;
+package DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +10,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import bean.AdminLogin;
 import org.mindrot.jbcrypt.BCrypt;
+
+import Bean.AdminLogin;
 
 public class AdminLoginDao {
 

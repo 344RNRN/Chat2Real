@@ -1,0 +1,126 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Meiryo", sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+/* メイン画面 */
+.chat-container {
+    width: 800px;
+    max-width: 95%;
+    margin: 30px auto;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* チャットタイトル */
+.chat-header {
+    padding: 20px;
+    background-color: #4a90e2;
+    color: white;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.chat-header p {
+    margin: 8px 0 0;
+    font-size: 14px;
+}
+
+/* メッセージ表示欄 */
+.chat-messages {
+    height: 500px;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f9fafc;
+}
+
+/* メッセージ */
+.message {
+    margin-bottom: 20px;
+}
+
+.message-info {
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #777;
+}
+
+.message-content {
+    display: inline-block;
+    max-width: 75%;
+    padding: 12px 16px;
+    background-color: #e8f1fc;
+    border-radius: 12px;
+    word-break: break-word;
+    line-height: 1.6;
+}
+
+/* 自分のメッセージ */
+.my-message {
+    text-align: right;
+}
+
+.my-message .message-content {
+    background-color: #d4f5dc;
+}
+
+/* 入力欄 */
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    background-color: white;
+}
+
+.chat-input-area textarea {
+    flex: 1;
+    height: 50px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+    font-size: 14px;
+}
+
+.send-button {
+    width: 100px;
+    border: none;
+    border-radius: 8px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background-color: #357abd;
+}
+
+/* 戻るボタン */
+.back-button {
+    display: block;
+    width: 150px;
+    margin: 20px auto;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #4a90e2;
+    border: 1px solid #4a90e2;
+    border-radius: 8px;
+}
+
+.back-button:hover {
+    background-color: #e8f1fc;
+}

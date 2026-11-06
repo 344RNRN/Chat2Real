@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import bean.AdminLogin;
-import dao.AdminLoginDao;
+import Bean.AdminLogin;
+import DAO.AdminLoginDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

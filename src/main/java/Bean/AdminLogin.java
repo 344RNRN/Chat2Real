@@ -1,5 +1,5 @@
 
-package bean;
+package Bean;
 
 import java.io.Serializable;
 
