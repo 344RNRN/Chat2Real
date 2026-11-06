@@ -27,7 +27,18 @@ public class AllChatAction extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
+        //HttpSession session = request.getSession(false);
+        //テスト用↓
+        HttpSession session = request.getSession();
+
+        if (session.getAttribute("participant_id") == null) {
+            session.setAttribute("participant_id", 2L);
+        }
+
+        if (session.getAttribute("event_id") == null) {
+            session.setAttribute("event_id", 4L);
+        }
+        //テスト終わり
 
         // ログイン情報の確認
         if (session == null
@@ -73,7 +84,7 @@ public class AllChatAction extends HttpServlet {
             request.setAttribute("participantId", participantId);
 
             // chat.jspを表示
-            request.getRequestDispatcher("/chat.jsp")
+            request.getRequestDispatcher("/participants/groupChat.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {

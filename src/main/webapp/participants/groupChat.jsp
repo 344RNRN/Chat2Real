@@ -1,5 +1,5 @@
 <%@ page import="Bean.MessageBean" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page import="java.util.List" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
@@ -28,42 +28,50 @@
     
 	<div class="chat-messages">
 
-    	<c:choose>
+    <%
+        List<MessageBean> messageList =
+            (List<MessageBean>) request.getAttribute("messageList");
 
-        	<c:when test="${not empty messageList}">
+        Long participantId =
+            (Long) request.getAttribute("participantId");
 
-            	<c:forEach var="message" items="${messageList}">
+        if (messageList != null && !messageList.isEmpty()) {
 
-                	<div class="message
-                    	${message.senderParticipantId == participantId
-                    	? 'my-message' : ''}">
+            for (MessageBean message : messageList) {
 
-                    	<div class="message-info">
-                        	参加者ID：
-                        	<c:out value="${message.senderParticipantId}" />
+                boolean isMyMessage =
+                    participantId != null &&
+                    participantId.longValue()
+                    == message.getSenderParticipantId();
+    %>
 
-                        	<c:out value="${message.sentAt}" />
-                    	</div>
+        <div class="message <%= isMyMessage ? "my-message" : "" %>">
 
-                    	<div class="message-content">
-                        	<c:out value="${message.messageText}" />
-                    	</div>
+            <div class="message-info">
+                参加者ID：
+                <%= message.getSenderParticipantId() %>
+                <%= message.getSentAt() %>
+            </div>
 
-                	</div>
+            <div class="message-content">
+                <%= escapeHtml(message.getMessageText()) %>
+            </div>
 
-            	</c:forEach>
+        </div>
 
-        	</c:when>
+    <%
+            }
 
-        	<c:otherwise>
+        } else {
+    %>
 
-            	<p>まだメッセージはありません。</p>
+        <p>まだメッセージはありません。</p>
 
-        	</c:otherwise>
+    <%
+        }
+    %>
 
-    	</c:choose>
-
-	</div>
+</div>
 
 
     <!-- メッセージ送信 -->
@@ -87,6 +95,22 @@
 <a href="eventHome.jsp" class="back-button">
     イベント画面へ戻る
 </a>
+
+<%!
+    private String escapeHtml(String text) {
+
+        if (text == null) {
+            return "";
+        }
+
+        return text
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#x27;");
+    }
+%>
 
 </body>
 </html>
