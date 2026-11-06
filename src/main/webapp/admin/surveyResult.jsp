@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.ArrayList, java.util.List" %>
+<%@ page import="Bean.SurveyResultBean" %>
 <%!
     private static String h(Object value) {
         if (value == null) {
@@ -21,26 +21,23 @@
     }
 %>
 <%
-    // ===== サーブレットから受け取るデータ（まだ無いときは 0・空にする） =====
-    String eventName = (String) request.getAttribute("eventName");
-    Integer participantCount = (Integer) request.getAttribute("participantCount");
-    Integer answerCount = (Integer) request.getAttribute("answerCount");
-    Double satisfactionAvg = (Double) request.getAttribute("satisfactionAvg");
-    int[] ratingCounts = (int[]) request.getAttribute("ratingCounts");   // [1]～[5] に ★1～★5 の件数
-    @SuppressWarnings("unchecked")
-    List<String[]> answers = (List<String[]>) request.getAttribute("answers");   // {回答日時, 満足度, アンケート回答, 不満点}
+    String ctx = request.getContextPath();
 
-    if (eventName == null) eventName = "";
-    if (participantCount == null) participantCount = 0;
-    if (answerCount == null) answerCount = 0;
-    if (ratingCounts == null) ratingCounts = new int[6];
-    if (answers == null) answers = new ArrayList<>();
+    // Action を通さずに JSP を開いたときは Action から開き直す
+    if (request.getAttribute("resultLoaded") == null) {
+        response.sendRedirect(ctx + "/admin/SurveyResult.action");
+        return;
+    }
 
-    // 回答率・満足度の平均（計算できないときは「－」）
-    String answerRateText = (participantCount > 0)
-            ? String.format("%.2f", (double) answerCount / participantCount) : "－";
-    String satisfactionText = (answerCount > 0 && satisfactionAvg != null)
-            ? String.format("%.1f", satisfactionAvg) : "－";
+    SurveyResultBean r = (SurveyResultBean) request.getAttribute("result");   // null = イベントなし
+    if (r == null) {
+        r = new SurveyResultBean();
+        r.setEventName("イベントがまだありません");
+    }
+
+    int[] ratingCounts = r.getRatingCounts();
+    int ratingTotal = r.getRatingTotal();
+    String backUrl = ctx + "/admin/EventDashboard.action" + (r.getEventId() > 0 ? "?eventId=" + r.getEventId() : "");
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -48,7 +45,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>アンケート結果 | Chat2Real</title>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/survey-result.css">
+    <link rel="stylesheet" href="<%= ctx %>/css/survey-result.css">
+    <style>
+        /* 「質問：回答」を1行ずつ */
+        .qa-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .qa-list li + li {
+            margin-top: 4px;
+        }
+        .qa-question {
+            color: #71819a;
+            font-size: 12px;
+        }
+        .muted {
+            color: #a2afc1;
+        }
+    </style>
 </head>
 <body>
 <%@ include file="/common/header.jsp" %>
@@ -59,10 +74,10 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">アンケート結果</h1>
-            <p class="page-sub"><%= h(eventName) %>　回答<%= answerCount %>件（参加者<%= participantCount %>名）</p>
+            <p class="page-sub"><%= h(r.getEventName()) %>　回答<%= r.getAnswerCount() %>件（参加者<%= r.getParticipantCount() %>名）</p>
         </div>
         <button type="button" name="backButton" class="back-button"
-                onclick="location.href='<%= request.getContextPath() %>/EventDashboard.jsp'">
+                onclick="location.href='<%= h(backUrl) %>'">
             ← イベント管理に戻る
         </button>
     </div>
@@ -71,26 +86,26 @@
     <div class="kpi-row">
         <div class="kpi-card">
             <span class="kpi-title">回答数</span>
-            <span class="kpi-value"><%= answerCount %><small>件</small></span>
+            <span class="kpi-value"><%= r.getAnswerCount() %><small>件</small></span>
         </div>
         <div class="kpi-card">
             <span class="kpi-title">回答率</span>
-            <span class="kpi-value"><%= answerRateText %></span>
+            <span class="kpi-value"><%= r.getAnswerRateText() %></span>
         </div>
         <div class="kpi-card">
             <span class="kpi-title">満足度（平均）</span>
-            <span class="kpi-value"><%= satisfactionText %></span>
+            <span class="kpi-value"><%= r.getSatisfactionText() %><% if (ratingTotal > 0) { %><small>/ 5</small><% } %></span>
         </div>
     </div>
 
     <!-- 5. 満足度の内訳（横棒グラフ：★5 から ★1 まで） -->
     <section class="card">
         <h2 class="card-title">満足度（交流のしやすさ）の内訳</h2>
-        <p class="card-sub">5段階評価（回答<%= answerCount %>件）</p>
+        <p class="card-sub">5段階評価（回答<%= ratingTotal %>件）</p>
 
 <% for (int star = 5; star >= 1; star--) {
        int count = ratingCounts[star];
-       int width = (answerCount > 0) ? count * 100 / answerCount : 0; %>
+       int width = (ratingTotal > 0) ? count * 100 / ratingTotal : 0; %>
         <div class="bar-row">
             <span class="bar-label">★<%= star %></span>
             <div class="bar-track"><div class="bar" style="width: <%= width %>%;"></div></div>
@@ -99,9 +114,9 @@
 <% } %>
     </section>
 
-    <!-- 6. 自由記述の回答一覧（新しい順） -->
+    <!-- 6. 回答一覧（新しい順） -->
     <section class="card">
-        <h2 class="card-title">自由記述の回答（新しい順）</h2>
+        <h2 class="card-title">回答一覧（新しい順）</h2>
 
         <table class="answer-table">
             <thead>
@@ -113,17 +128,28 @@
                 </tr>
             </thead>
             <tbody>
-<% if (answers.isEmpty()) { %>
+<% if (r.getRows().isEmpty()) { %>
                 <tr>
                     <td colspan="4" class="empty">まだアンケートの回答はありません</td>
                 </tr>
 <% } else { %>
-<%     for (String[] a : answers) { %>
+<%     for (SurveyResultBean.Row row : r.getRows()) { %>
                 <tr>
-                    <td><%= h(a[0]) %></td>
-                    <td>★<%= h(a[1]) %></td>
-                    <td><%= h(a[2]) %></td>
-                    <td><%= h(a[3]) %></td>
+                    <td><%= h(row.getAnsweredAtText()) %></td>
+                    <td><%= row.getRating() != null ? "★" + row.getRating() : "－" %></td>
+                    <td>
+                    <% if (row.getAnswers().isEmpty()) { %>
+                        <span class="muted">－</span>
+                    <% } else { %>
+                        <ul class="qa-list">
+                        <% for (String[] qa : row.getAnswers()) { %>
+                            <li><span class="qa-question"><%= h(qa[0]) %></span><br><%= h(qa[1]) %></li>
+                        <% } %>
+                        </ul>
+                    <% } %>
+                    </td>
+                    <td><%= (row.getComplaint() == null || row.getComplaint().isEmpty())
+                            ? "<span class=\"muted\">－</span>" : h(row.getComplaint()) %></td>
                 </tr>
 <%     } %>
 <% } %>

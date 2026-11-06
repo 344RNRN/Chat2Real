@@ -33,6 +33,43 @@ body {
 }
 
 
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    /* 表示ボタンと文字が重ならないように右側を空ける */
+    .input-wrapper input[type="password"],
+    .input-wrapper input.is-visible {
+        padding-right: 72px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        margin: 0;
+        padding: 6px;
+        color: #7184a0;
+        background: transparent;
+        border: none;
+        font-family: inherit;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .password-toggle:hover {
+        color: #f45b91;
+    }
+
+    .password-toggle:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+
 /* =========================
    Header
 ========================= */
@@ -1050,11 +1087,4 @@ body {
     .login-section {
         margin-right: 0;
     }
-}
-
-/* パスワードの「表示」ボタン（ログイン画面と同じ小さい文字） */
-.password-toggle {
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
 }

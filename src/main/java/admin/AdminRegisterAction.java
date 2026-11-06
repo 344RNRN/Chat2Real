@@ -1,140 +1,137 @@
-
 package admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import Bean.AccountBean;
-import DAO.AccountDAO;
+import Bean.AdminRegisterBean;
+import DAO.AdminRegisterDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
+/**
+ * 運営者アカウント作成
+ *
+ * GET  … adminRegister.jsp を表示
+ * POST … 入力チェック → 重複チェック → パスワードを BCrypt で変換 → 登録 → ログイン画面へ
+ */
 @WebServlet("/admin/register")
 public class AdminRegisterAction extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+    private static final String JSP = "/admin/adminRegister.jsp";
+    private static final String COMPLETE  = "/admin/adminRegisterComplete.jsp";
 
-        response.sendRedirect(
-            request.getContextPath() + "/admin/adminRegister.jsp"
-        );
+    /** JSP の maxlength と同じ */
+    private static final int MAX_NAME = 50;
+    private static final int MAX_EMAIL = 50;
+
+    /** 英字と数字を1文字以上含む8文字以上（JSP の pattern と同じ） */
+    private static final Pattern PASSWORD_RULE = Pattern.compile("(?=.*[A-Za-z])(?=.*[0-9]).{8,}");
+    /** 簡単なメール形式チェック */
+    private static final Pattern EMAIL_RULE = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+
+    // =========================================================
+    // GET：画面表示
+    // =========================================================
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher(JSP).forward(request, response);
     }
 
+    // =========================================================
+    // POST：アカウントを作成
+    // =========================================================
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
 
-        // 画面から受け取る
-        String organizerName = request.getParameter("organizerName");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String passwordConfirm = request.getParameter("passwordConfirm");
+        String organizerName = trim(request.getParameter("organizerName"));
+        String email = trim(request.getParameter("email")).toLowerCase();
+        String password = nvl(request.getParameter("password"));            // 空白も文字として扱う
+        String passwordConfirm = nvl(request.getParameter("passwordConfirm"));
 
-        // 1. 未入力チェック
-        if (isBlank(organizerName) || isBlank(email)
-                || isBlank(password) || isBlank(passwordConfirm)) {
-
-            showError(request, response, "すべての項目を入力してください。");
+        // ---------- 1. 入力チェック ----------
+        String error = validate(organizerName, email, password, passwordConfirm);
+        if (error != null) {
+            forwardWithError(request, response, error);
             return;
         }
 
-        organizerName = organizerName.trim();
-        email = email.trim();
-
-        // 2. 文字数チェック（DBの login_id は50文字まで）
-        if (organizerName.length() > 50) {
-            showError(request, response, "運営者名は50文字以内で入力してください。");
-            return;
-        }
-
-        if (email.length() > 50) {
-            showError(request, response, "メールアドレスは50文字以内で入力してください。");
-            return;
-        }
-
-        // 3. メールアドレスの形式チェック
-        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
-            showError(request, response, "メールアドレスの形式が正しくありません。");
-            return;
-        }
-
-        // 4. パスワードのチェック（英字と数字を含む8文字以上）
-        if (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{8,72}$")) {
-            showError(request, response, "パスワードは英字と数字を含む8文字以上で入力してください。");
-            return;
-        }
-
-        // 5. パスワード（確認）と同じかチェック
-        if (!password.equals(passwordConfirm)) {
-            showError(request, response, "パスワードとパスワード（確認）が一致しません。");
-            return;
-        }
-
+        AdminRegisterDAO dao = new AdminRegisterDAO();
         try {
-            AccountDAO dao = new AccountDAO();
-
-            // 6. 同じメールアドレスが登録済みかチェック
-            if (dao.findByLoginId(email) != null) {
-                showError(request, response, "このメールアドレスは既に登録されています。");
+            // ---------- 2. 重複チェック ----------
+            if (dao.existsLoginId(email)) {
+                forwardWithError(request, response, "このメールアドレスはすでに登録されています");
                 return;
             }
 
-            // 7. パスワードを暗号化（BCrypt）して登録
-            AccountBean account = new AccountBean();
-            account.setLoginId(email);
-            account.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
-            account.setAccountName(organizerName);
+            // ---------- 3. 登録（パスワードは BCrypt で変換して保存） ----------
+            AdminRegisterBean bean = new AdminRegisterBean();
+            bean.setAccountName(organizerName);
+            bean.setLoginId(email);
+            bean.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
 
-            dao.insertAccount(account);
+            if (dao.insert(bean) < 0) {
+                // 重複チェックの後、同じメールで先に登録された場合
+                forwardWithError(request, response, "このメールアドレスはすでに登録されています");
+                return;
+            }
 
         } catch (SQLException e) {
-
-            throw new ServletException(
-                "運営者アカウントの登録に失敗しました。", e
-            );
+            e.printStackTrace();
+            forwardWithError(request, response, "アカウントの作成に失敗しました。もう一度お試しください");
+            return;
         }
 
-        // 8. 登録できたら完了画面へ（表示用に運営者名とメールをセッションに一時保存）
-        HttpSession session = request.getSession();
-        session.setAttribute("registeredName", organizerName);
-        session.setAttribute("registeredEmail", email);
-
-        response.sendRedirect(
-            request.getContextPath() + "/admin/adminRegisterComplete.jsp"
-        );
+        // ---------- 4. ログイン画面へ（再読み込みで二重登録しないようにリダイレクト） ----------
+        response.sendRedirect(request.getContextPath() + COMPLETE);
     }
 
-    // 空かどうか
-    private static boolean isBlank(String value) {
-        return value == null || value.isBlank();
+    // =========================================================
+    // 入力チェック（エラーがなければ null）
+    // =========================================================
+    private String validate(String name, String email, String password, String confirm) {
+        if (name.isEmpty()) return "運営者名（団体名）を入力してください";
+        if (name.length() > MAX_NAME) return "運営者名は" + MAX_NAME + "文字以内で入力してください";
+
+        if (email.isEmpty()) return "メールアドレスを入力してください";
+        if (email.length() > MAX_EMAIL) return "メールアドレスは" + MAX_EMAIL + "文字以内で入力してください";
+        if (!EMAIL_RULE.matcher(email).matches()) return "メールアドレスの形式が正しくありません";
+
+        if (password.isEmpty()) return "パスワードを入力してください";
+        if (!PASSWORD_RULE.matcher(password).matches())
+            return "パスワードは英字と数字を含む8文字以上で入力してください";
+        // BCrypt は72バイトまでしか使わないので長すぎるものは断る
+        if (password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
+            return "パスワードが長すぎます（半角72文字以内）";
+
+        if (!password.equals(confirm)) return "パスワードと確認用パスワードが一致しません";
+
+        return null;
     }
 
-    // エラーメッセージを付けてアカウント作成画面に戻る
-    private void showError(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            String message)
+    /** 画面に戻す（運営者名・メールは JSP が getParameter で入れ直す。パスワードは空になる） */
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String error)
             throws ServletException, IOException {
+        request.setAttribute("errorMessage", error);
+        request.getRequestDispatcher(JSP).forward(request, response);
+    }
 
-        request.setAttribute("errorMessage", message);
+    private static String trim(String s) {
+        return s == null ? "" : s.trim();
+    }
 
-        request.getRequestDispatcher(
-            "/admin/adminRegister.jsp"
-        ).forward(request, response);
+    private static String nvl(String s) {
+        return s == null ? "" : s;
     }
 }
