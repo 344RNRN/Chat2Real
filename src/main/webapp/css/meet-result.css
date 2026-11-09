@@ -1,0 +1,316 @@
+/* ========================================
+   Chat2Real - 交流結果登録画面（participants/meetResult.jsp）
+   ※ 色・形は meetup.css（合流画面）に合わせています
+   ======================================== */
+
+:root {
+    --primary-color: #ed7628;
+    --primary-hover: #d9651c;
+
+    --blue-color: #4a7fd6;
+
+    --pink-color: #f582ad;
+    --pink-dark: #ed477a;
+
+    --text-primary: #292929;
+    --text-secondary: #737373;
+
+    --border-color: #e7e4e1;
+    --background-color: #f8f7f5;
+    --surface-color: #ffffff;
+
+    --radius-small: 6px;
+    --radius-medium: 10px;
+    --radius-large: 14px;
+
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+.result-page {
+    flex: 1;
+    width: min(100% - 48px, 560px);
+    margin: 0 auto;
+    padding: 24px 0 60px;
+
+    color: var(--text-primary);
+    font-family:
+        "Noto Sans JP",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
+    box-sizing: border-box;
+}
+
+.result-page *,
+.result-page *::before,
+.result-page *::after {
+    box-sizing: border-box;
+}
+
+.result-page a {
+    text-decoration: none;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 14px;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.back-link:hover {
+    color: var(--primary-color);
+}
+
+
+/* ========================================
+   Page Heading（交流結果の登録）
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 20px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+
+    color: var(--primary-color);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.page-heading h1 {
+    margin: 0;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.page-description {
+    margin: 6px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* ========================================
+   エラーメッセージ
+   ======================================== */
+
+.error-message {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+
+    color: #c0392b;
+    background: #fdecea;
+    border: 1px solid #f5c6c0;
+    border-radius: var(--radius-medium);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   白いパネル
+   ======================================== */
+
+.result-panel {
+    margin: 0;
+    padding: 24px 22px;
+
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-card);
+}
+
+.empty-message {
+    margin: 0;
+
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* ========================================
+   1. 質問文
+   ======================================== */
+
+.question {
+    margin: 0 0 18px;
+
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-align: center;
+}
+
+
+/* ========================================
+   2, 3. 会って話せた／会えなかった
+   ======================================== */
+
+.choice-list {
+    display: grid;
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+.choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 52px;
+    padding: 0 16px;
+
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.choice input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* 会って話せた＝青、会えなかった＝オレンジ（トップ画面と同じ組み合わせ） */
+.choice.met input {
+    accent-color: var(--blue-color);
+}
+
+.choice.not-met input {
+    accent-color: var(--primary-color);
+}
+
+.choice.met:has(input:checked) {
+    background: #eef4fd;
+    border-color: var(--blue-color);
+}
+
+.choice.not-met:has(input:checked) {
+    background: #fff1e6;
+    border-color: var(--primary-color);
+}
+
+
+/* ========================================
+   4. 会えなかった理由
+   ======================================== */
+
+.reason-label {
+    display: block;
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.reason-select {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+
+    color: var(--text-primary);
+    background: #ffffff;
+
+    border: 1px solid #dcd8d3;
+    border-radius: var(--radius-small);
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+    outline: none;
+}
+
+.reason-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(237, 118, 40, 0.10);
+}
+
+.reason-select:disabled {
+    color: #b5b0aa;
+    background: #f0eeeb;
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   5, 6. 注意書き・登録する
+   ======================================== */
+
+.result-note {
+    margin: 16px 0;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.register-button {
+    width: 100%;
+    height: 44px;
+
+    color: #ffffff;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-medium);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.register-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+
+/* ========================================
+   Responsive Design（スマートフォン）
+   ======================================== */
+
+@media (max-width: 700px) {
+
+    .result-page {
+        width: calc(100% - 32px);
+        padding: 18px 0 40px;
+    }
+
+    .page-heading h1 {
+        font-size: 24px;
+    }
+
+    .result-panel {
+        padding: 20px 16px;
+    }
+}
