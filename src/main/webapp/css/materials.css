@@ -1,0 +1,315 @@
+/* ========================================
+   Chat2Real - イベント資料画面（participants/materials.jsp）
+   ※ 色・形は top.css / meetup.css に合わせています
+   ======================================== */
+
+:root {
+    --primary-color: #ed7628;
+    --primary-hover: #d9651c;
+
+    --blue-color: #4a7fd6;
+    --blue-hover: #3a6bc0;
+
+    --pink-dark: #ed477a;
+
+    --text-primary: #292929;
+    --text-secondary: #737373;
+
+    --border-color: #e7e4e1;
+    --background-color: #f8f7f5;
+    --surface-color: #ffffff;
+
+    --radius-small: 6px;
+    --radius-medium: 10px;
+    --radius-large: 14px;
+
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+.materials-page {
+    flex: 1;
+    width: min(100% - 48px, 760px);
+    margin: 0 auto;
+    padding: 24px 0 60px;
+
+    color: var(--text-primary);
+    font-family:
+        "Noto Sans JP",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
+    box-sizing: border-box;
+}
+
+.materials-page *,
+.materials-page *::before,
+.materials-page *::after {
+    box-sizing: border-box;
+}
+
+.materials-page a {
+    text-decoration: none;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 14px;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.back-link:hover {
+    color: var(--primary-color);
+}
+
+
+/* ========================================
+   Page Heading
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 18px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+
+    color: var(--primary-color);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.page-heading h1 {
+    margin: 0;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.page-description {
+    margin: 6px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+
+/* ========================================
+   1, 2. 交流したい／今はしない（トップ画面と同じ色）
+   ======================================== */
+
+.mood-buttons {
+    display: flex;
+    gap: 4%;
+
+    margin: 0 0 16px;
+}
+
+.mood-button {
+    width: 48%;
+    height: 40px;
+
+    border-radius: var(--radius-medium);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mood-button.want {
+    color: var(--blue-color);
+    background: #ffffff;
+    border: 1px solid var(--blue-color);
+}
+
+.mood-button.want:hover,
+.mood-button.want.selected {
+    color: #ffffff;
+    background: var(--blue-color);
+}
+
+.mood-button.not-now {
+    color: var(--primary-color);
+    background: #ffffff;
+    border: 1px solid var(--primary-color);
+}
+
+.mood-button.not-now:hover,
+.mood-button.not-now.selected {
+    color: #ffffff;
+    background: var(--primary-color);
+}
+
+
+/* ========================================
+   白いパネル
+   ======================================== */
+
+.panel {
+    padding: 20px 22px;
+
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-card);
+}
+
+.section-title {
+    margin: 0 0 12px;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.empty-message {
+    margin: 0;
+
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* ========================================
+   3～7. お知らせ・資料の一覧
+   ======================================== */
+
+.item-list {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 14px 0;
+
+    border-top: 1px solid var(--border-color);
+}
+
+.item:first-child {
+    border-top: none;
+    padding-top: 4px;
+}
+
+.kind-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: var(--radius-small);
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.kind-icon.file {
+    color: var(--blue-color);
+    background: #eef4fd;
+}
+
+.kind-icon.notice {
+    color: var(--pink-dark);
+    background: #fff0f5;
+}
+
+.item-body {
+    min-width: 0;
+}
+
+.item-title {
+    margin: 0 0 4px;
+
+    font-size: 14px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.item-text {
+    margin: 0 0 4px;
+
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.item-meta {
+    display: block;
+
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.file-link {
+    display: inline-block;
+    margin-top: 6px;
+
+    color: var(--blue-color);
+    font-size: 13px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.file-link:hover {
+    color: var(--blue-hover);
+    text-decoration: underline;
+}
+
+
+/* ========================================
+   8. 説明文
+   ======================================== */
+
+.materials-note {
+    margin: 12px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+
+/* ========================================
+   Responsive Design（スマートフォン）
+   ======================================== */
+
+@media (max-width: 700px) {
+
+    .materials-page {
+        width: calc(100% - 32px);
+        padding: 18px 0 40px;
+    }
+
+    .page-heading h1 {
+        font-size: 24px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+}

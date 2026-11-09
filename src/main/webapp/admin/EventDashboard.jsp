@@ -164,7 +164,7 @@
                     <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/SurveyResult.action?eventId=<%= ev.getEventId() %>'">アンケート結果</button>
                     <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/QRCode.jsp'">QRコード</button>
                     <button type="button" class="btn btn-primary" onclick="location.href='<%= ctx %>/admin/Notification.jsp'">お知らせ配信</button>
-                    <button type="button" class="btn btn-danger" onclick="location.href='<%= ctx %>/admin/EventEnd.jsp'">イベント終了</button>
+                    <button type="button" class="btn btn-danger" onclick="location.href='<%= ctx %>/admin/EventEnd.action?eventId=<%= ev.getEventId() %>'">イベント終了</button>
                 <% } %>
                 </div>
 

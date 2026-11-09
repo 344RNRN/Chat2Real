@@ -1,0 +1,339 @@
+/* ========================================
+   Chat2Real - 参加者のメッセージ画面（共通）
+     participants/chatEnd.jsp       07_チャット終了
+     participants/mutualConsent.jsp 09_相互承認
+     participants/surveyComplete.jsp 13-2_送信完了
+   ※ 色・形は meetup.css（合流画面）に合わせています
+   ======================================== */
+
+:root {
+    --primary-color: #ed7628;
+    --primary-hover: #d9651c;
+
+    --blue-color: #4a7fd6;
+
+    --pink-color: #f582ad;
+    --pink-dark: #ed477a;
+
+    --green-color: #2fa58c;
+
+    --text-primary: #292929;
+    --text-secondary: #737373;
+
+    --border-color: #e7e4e1;
+    --background-color: #f8f7f5;
+    --surface-color: #ffffff;
+
+    --radius-medium: 10px;
+    --radius-large: 14px;
+
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+.message-page {
+    flex: 1;
+    width: min(100% - 48px, 520px);
+    margin: 0 auto;
+    padding: 24px 0 60px;
+
+    color: var(--text-primary);
+    font-family:
+        "Noto Sans JP",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
+    box-sizing: border-box;
+}
+
+.message-page *,
+.message-page *::before,
+.message-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ========================================
+   Page Heading
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 20px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+
+    color: var(--primary-color);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.page-title {
+    margin: 0;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.page-description {
+    margin: 6px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+
+/* ========================================
+   白いカード（中央寄せ）
+   ======================================== */
+
+.message-card {
+    padding: 28px 24px;
+
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-card);
+
+    text-align: center;
+}
+
+.empty-message {
+    margin: 0 0 20px;
+
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+
+/* ========================================
+   相手のアイコン・名前
+   ======================================== */
+
+.person-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: fit-content;
+    margin: 0 auto 20px;
+    padding: 6px 14px 6px 6px;
+
+    background: var(--background-color);
+    border-radius: 999px;
+}
+
+.person-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    color: #ffffff;
+    background: #ed874b;
+    border-radius: 50%;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar.large {
+    width: 56px;
+    height: 56px;
+
+    font-size: 22px;
+}
+
+.avatar.me {
+    background: var(--primary-color);
+}
+
+.avatar.partner {
+    background: var(--pink-dark);
+}
+
+
+/* ========================================
+   アイコン（✕・✓・♥）
+   ======================================== */
+
+.status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 56px;
+    height: 56px;
+    margin-bottom: 14px;
+
+    border-radius: 50%;
+
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.status-icon.end {
+    color: var(--text-secondary);
+    background: #f0eeeb;
+}
+
+.status-icon.done {
+    color: var(--green-color);
+    background: #e7f6f2;
+}
+
+.status-icon.match {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+
+    color: var(--pink-dark);
+    background: #fff0f5;
+
+    font-size: 20px;
+}
+
+/* 自分 ♥ 相手 */
+.pair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+/* ========================================
+   メッセージ
+   ======================================== */
+
+.message-title {
+    margin: 0 0 10px;
+
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.message-text {
+    margin: 0 0 18px;
+
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.note {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+
+    color: #8a5a1c;
+    background: #fff8eb;
+    border: 1px solid #fbe0ad;
+    border-radius: var(--radius-medium);
+
+    font-size: 12px;
+    line-height: 1.8;
+    text-align: left;
+}
+
+
+/* ========================================
+   ボタン・リンク
+   ======================================== */
+
+.message-card form {
+    margin: 0;
+}
+
+.main-button {
+    width: 100%;
+    height: 44px;
+
+    color: #ffffff;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-medium);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.main-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.sub-link {
+    display: inline-block;
+    margin-top: 16px;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sub-link:hover {
+    color: var(--primary-color);
+}
+
+.close-hint {
+    margin: 12px 0 0;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+
+/* ========================================
+   Responsive Design（スマートフォン）
+   ======================================== */
+
+@media (max-width: 700px) {
+
+    .message-page {
+        width: calc(100% - 32px);
+        padding: 18px 0 40px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .message-card {
+        padding: 24px 16px;
+    }
+}
