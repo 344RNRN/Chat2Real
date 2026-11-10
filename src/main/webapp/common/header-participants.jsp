@@ -123,7 +123,7 @@
 
     <div class="header-left">
 
-        <a href="${pageContext.request.contextPath}/admin/login.jsp"
+        <a href="${pageContext.request.contextPath}/admin/topScreen.jsp"
            class="logo">
             Chat2<span>Real</span>
         </a>
