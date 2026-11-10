@@ -137,6 +137,7 @@ public class EventCreateDAO {
                 ps.setNull(6, Types.INTEGER);
             }
             ps.setString(7, b.getEventDescription());
+           
 
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();

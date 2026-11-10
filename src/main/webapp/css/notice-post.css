@@ -359,8 +359,9 @@
 
 .notice-history th:last-child,
 .notice-history td:last-child {
-    width: 55px;
+    width: 70px;
     text-align: center;
+    vertical-align: middle;
 }
 
 /* =========================
@@ -464,33 +465,170 @@
     }
 }
 /* =========================
-   添付・削除ボタン
+   対象イベント・ダッシュボードへ戻る
 ========================= */
 
-.notice-history .attachment-delete {
+.notice-event-name {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    gap: 6px 14px;
+    margin: 4px 0 0;
+
+    color: #7184a0;
+    font-size: 14px;
 }
 
-.notice-history .attachment-delete form {
+.notice-event-name strong {
+    color: #203653;
+}
+
+.dashboard-link {
+    color: #f45b91;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.dashboard-link:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   配信・削除の結果メッセージ
+========================= */
+
+.notice-message {
+    margin: -10px 0 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.notice-message.ok {
+    color: #1f7a4d;
+    background: #eefaf3;
+    border: 1px solid #c9ecd8;
+}
+
+.notice-message.ng {
+    color: #c62828;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+}
+
+/* =========================
+   配信済みのお知らせ（中身）
+========================= */
+
+.history-count {
+    margin-left: 8px;
+    padding: 2px 10px;
+
+    color: #3b82f6;
+    background: #eef4ff;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.notice-history .time-cell {
+    color: #7184a0;
+    font-size: 12px;
+}
+
+.history-title {
+    display: block;
+    color: #203653;
+    font-size: 14px;
+}
+
+.history-text {
+    display: block;
+    margin-top: 2px;
+    color: #536176;
+    white-space: pre-wrap;
+}
+
+.history-empty {
+    padding: 28px 10px !important;
+    color: #7184a0;
+    text-align: center !important;
+}
+
+/* 添付ファイル */
+
+.history-attachment {
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 6px;
+    padding: 3px 10px;
+
+    color: #3b82f6;
+    background: #eef4ff;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-attachment:hover {
+    text-decoration: underline;
+}
+
+.file-row {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+
+.file-note {
+    color: #7184a0;
+    font-size: 12px;
+}
+
+/* 削除ボタン */
+
+.notice-history .delete-form {
     display: inline-block;
     margin: 0;
 }
 
 .notice-history .delete-button {
-    display: inline-block;
-    padding: 5px 12px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    min-height: 32px;
+    padding: 0 12px;
+
+    color: #c62828;
+    background: #ffffff;
+    border: 1px solid #fecdd3;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
     white-space: nowrap;
+
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .notice-history .delete-button:hover {
-    background-color: #b02a37;
+    background: #fff1f2;
+    border-color: #c62828;
+}
+
+@media (max-width: 600px) {
+    .notice-page-header {
+        align-items: flex-start;
+    }
+
+    .notice-event-name {
+        font-size: 13px;
+    }
 }

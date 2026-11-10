@@ -1,0 +1,455 @@
+@charset "UTF-8";
+
+/* ========================================
+   Chat2Real - 参加者の登録完了・プロフィール画面
+     participants/accountComplete.jsp
+     participants/accountProfile.jsp
+   ※ 色・形は account-register.css（参加者アカウント登録）に合わせています
+   ======================================== */
+
+:root {
+    --navy: #102a56;
+    --pink: #ed1760;
+    --pink-dark: #d90f52;
+    --pink-soft: #fff0f6;
+    --blue-soft: #eef4ff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #d8e0ee;
+    --surface: #ffffff;
+    --shadow: 0 14px 36px rgba(28, 48, 91, .12);
+}
+
+/* header-participants.jsp の body の背景より優先させるため、body にクラスを付けている */
+body.account-page {
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    background:
+        radial-gradient(circle at 12% 40%, rgba(255, 211, 232, .55), transparent 34%),
+        radial-gradient(circle at 85% 25%, rgba(198, 220, 255, .65), transparent 36%),
+        linear-gradient(125deg, #fff8fc 0%, #f2f6ff 52%, #fff5fa 100%);
+    background-attachment: fixed;
+}
+
+.account-main {
+    flex: 1;
+    width: min(640px, 92%);
+    margin: 28px auto 40px;
+}
+
+.account-main *,
+.account-main *::before,
+.account-main *::after {
+    box-sizing: border-box;
+}
+
+
+/* ========================================
+   見出し
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.eyebrow {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #ff397d, var(--pink));
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.page-title {
+    margin: 14px 0 6px;
+    color: var(--navy);
+    font-size: clamp(25px, 3vw, 32px);
+    line-height: 1.35;
+}
+
+.page-description {
+    margin: 0;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   白いカード（.form-card と同じ）
+   ======================================== */
+
+.card {
+    margin-bottom: 18px;
+    padding: 26px 30px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: var(--shadow);
+}
+
+/* ピンクの見出しバー（.section-title-bar と同じ） */
+.section-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 0 16px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #ffe5ef, #fff1f7);
+    color: var(--pink);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.visibility {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.visibility.public  { color: #2458c6; }
+.visibility.private { color: var(--pink-dark); }
+
+
+/* ========================================
+   写真・ニックネーム
+   ======================================== */
+
+.profile-main {
+    text-align: center;
+}
+
+.avatar {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b9d, var(--pink));
+    color: #ffffff;
+    font-weight: 800;
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar.large {
+    width: 104px;
+    height: 104px;
+    border: 4px solid #ffffff;
+    box-shadow: 0 0 0 2px #ffc1d6, 0 8px 20px rgba(237, 23, 96, .18);
+    font-size: 40px;
+}
+
+.avatar.small {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+}
+
+.profile-name {
+    margin: 14px 0 2px;
+    color: var(--navy);
+    font-size: 24px;
+    overflow-wrap: anywhere;
+}
+
+.profile-age {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status-badge.want {
+    border: 1px solid #ff9cbd;
+    background: var(--pink-soft);
+    color: var(--pink);
+}
+
+.status-badge.not-now {
+    border: 1px solid var(--border);
+    background: #f5f7fb;
+    color: var(--muted);
+}
+
+
+/* ========================================
+   項目の一覧
+   ======================================== */
+
+.profile-list {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 14px 16px;
+    margin: 0;
+}
+
+.profile-list dt {
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.profile-list dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.muted {
+    color: #9aa6b8;
+}
+
+/* 興味タグ（.tag-label のチェック済みと同じ見た目） */
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 13px;
+    border: 1px solid #ff9cbd;
+    border-radius: 22px;
+    background: var(--pink-soft);
+    color: var(--pink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   案内（.info-box と同じ）
+   ======================================== */
+
+.info-box {
+    margin: 18px 0 0;
+    padding: 13px 15px;
+    border-radius: 12px;
+    background: #f0f4ff;
+    color: #40516e;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+/* ========================================
+   ボタン
+   ======================================== */
+
+.button-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+/* .btn-submit と同じ */
+.btn-primary,
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: min(100%, 380px);
+    min-height: 52px;
+    padding: 12px 22px;
+    border-radius: 13px;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.btn-primary {
+    border: 0;
+    background: linear-gradient(90deg, #f01862, #e80d59);
+    color: #ffffff;
+    box-shadow: 0 7px 16px rgba(237, 23, 96, .18);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(237, 23, 96, .24);
+}
+
+.btn-secondary {
+    border: 1.5px solid var(--border);
+    background: #ffffff;
+    color: var(--navy);
+    font-size: 15px;
+}
+
+.btn-secondary:hover {
+    border-color: #ff9cbd;
+    color: var(--pink);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .35);
+    outline-offset: 3px;
+}
+
+.btn-icon {
+    font-size: 19px;
+    line-height: 1;
+}
+
+/* 押せないチャットボタン（自分のプロフィールなど） */
+.btn-primary:disabled {
+    background: #e4e9f2;
+    color: #8a96aa;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary:disabled .btn-icon {
+    filter: grayscale(1);
+    opacity: .6;
+}
+
+.disabled-reason {
+    margin: -4px 0 4px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.text-link {
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.text-link:hover {
+    color: var(--pink);
+}
+
+.footer-note {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+    text-align: center;
+}
+
+
+/* ========================================
+   登録完了画面
+   ======================================== */
+
+.complete-card {
+    text-align: center;
+}
+
+.done-icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    margin: 4px auto 16px;
+    border-radius: 50%;
+    background: var(--pink-soft);
+    color: var(--pink);
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.complete-title {
+    margin: 0 0 16px;
+    color: var(--navy);
+    font-size: 22px;
+}
+
+.person-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 6px 16px 6px 6px;
+    border: 1px solid #ffd3e2;
+    border-radius: 999px;
+    background: #fff7fa;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.complete-text {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.event-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 20px;
+    margin: 0 0 6px;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   スマートフォン
+   ======================================== */
+
+@media (max-width: 520px) {
+    .account-main {
+        width: 94%;
+        margin-top: 18px;
+    }
+
+    .card {
+        padding: 20px 16px;
+        border-radius: 18px;
+    }
+
+    .profile-list {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .profile-list dd {
+        margin-bottom: 12px;
+    }
+
+    .btn-primary {
+        font-size: 16px;
+    }
+}

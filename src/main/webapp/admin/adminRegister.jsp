@@ -170,27 +170,10 @@
 
 <%@ include file="/common/footer.jsp" %>
 
-<<<<<<< HEAD
 
 
 <!-- Password Visibility（パスワード・確認の両方） -->
-<script>
-    document.querySelectorAll(".password-toggle").forEach(function (button) {
-        const input = document.getElementById(button.dataset.target);
-        if (!input) return;
 
-        button.addEventListener("click", function () {
-            const isPassword = input.type === "password";
-
-            input.type = isPassword ? "text" : "password";
-            input.classList.toggle("is-visible", isPassword);
-            button.textContent = isPassword ? "非表示" : "表示";
-            button.setAttribute("aria-label",
-                isPassword ? "パスワードを隠す" : "パスワードを表示");
-        });
-    });
-</script>
-=======
 <script>
     const passwordInput = document.getElementById("password");
     const toggleButton = document.getElementById("togglePassword");
@@ -210,5 +193,5 @@
 
 </body>
 </html>
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
+
 

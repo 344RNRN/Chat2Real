@@ -1,4 +1,4 @@
-package admin;
+package participant;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class AccountRegisterAction extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final String JSP = "/participants/accountRegister.jsp";
-    private static final String TOP = "/admin/topScreen.jsp";
+    private static final String acc_complete = "/participants/accountComplete.jsp";
     private static final String UPLOAD_DIR = "/uploads/profiles";
     private static final long MAX_PHOTO_SIZE = 5L * 1024 * 1024;
 
@@ -135,7 +135,7 @@ public class AccountRegisterAction extends HttpServlet {
         session.setAttribute("participantId", bean.getParticipantId());
         session.setAttribute("eventId", bean.getEventId());
 
-        response.sendRedirect(request.getContextPath() + TOP);
+        response.sendRedirect(request.getContextPath() +acc_complete);
     }
 
     // =========================================================

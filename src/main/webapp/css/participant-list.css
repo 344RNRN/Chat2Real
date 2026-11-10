@@ -1,27 +1,34 @@
+@charset "UTF-8";
+
 /* ========================================
-   Chat2Real - Participant List
+   Chat2Real - 参加者一覧（participants/participantList.jsp）
+   ※ 色・形は account-register.css / account-profile.css（参加登録・プロフィール）に合わせています
    ======================================== */
 
 :root {
-    --primary-color: #ed7628;
-    --primary-hover: #d9651c;
-
-    --text-primary: #292929;
-    --text-secondary: #737373;
-
-    --border-color: #e7e4e1;
-    --background-color: #f8f7f5;
-    --surface-color: #ffffff;
-
-    --tag-background: #f8e8d9;
-
-    --radius-small: 6px;
-    --radius-medium: 10px;
-    --radius-large: 14px;
-
-    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+    --navy: #102a56;
+    --pink: #ed1760;
+    --pink-dark: #d90f52;
+    --pink-soft: #fff0f6;
+    --blue-soft: #eef4ff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #d8e0ee;
+    --surface: #ffffff;
+    --shadow: 0 14px 36px rgba(28, 48, 91, .12);
+    --shadow-small: 0 6px 18px rgba(28, 48, 91, .07);
 }
 
+/* header-participants.jsp の body の背景より優先させるため、body にクラスを付けている */
+body.participant-list-page {
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    background:
+        radial-gradient(circle at 12% 40%, rgba(255, 211, 232, .55), transparent 34%),
+        radial-gradient(circle at 85% 25%, rgba(198, 220, 255, .65), transparent 36%),
+        linear-gradient(125deg, #fff8fc 0%, #f2f6ff 52%, #fff5fa 100%);
+    background-attachment: fixed;
+}
 
 
 /* ========================================
@@ -29,18 +36,11 @@
    ======================================== */
 
 .participant-page {
-    width: min(100% - 48px, 1000px);
+    flex: 1;
+    width: min(100% - 48px, 920px);
     margin: 0 auto;
-    padding: 36px 0 60px;
-
-    color: var(--text-primary);
-    font-family:
-        "Noto Sans JP",
-        "Yu Gothic",
-        "Meiryo",
-        sans-serif;
-
-    box-sizing: border-box;
+    padding: 32px 0 48px;
+    color: var(--text);
 }
 
 .participant-page *,
@@ -50,6 +50,7 @@
 }
 
 .participant-page a {
+    color: inherit;
     text-decoration: none;
 }
 
@@ -60,239 +61,311 @@
 
 .page-heading {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 24px;
-
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .page-eyebrow {
     display: inline-block;
-    margin-bottom: 8px;
-
-    color: var(--primary-color);
-
-    font-size: 11px;
+    margin-bottom: 12px;
+    padding: 7px 18px;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #ff397d, var(--pink));
+    color: #ffffff;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: .12em;
 }
 
 .page-heading h1 {
     margin: 0;
-
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.5;
+    color: var(--navy);
+    font-size: clamp(26px, 3vw, 32px);
+    line-height: 1.35;
 }
 
 .page-description {
     margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
 
-    color: var(--text-secondary);
+/* 右側：人数とチャット画面ボタン */
+.heading-side {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* チャット画面へ（カードの「チャットする」と区別するため白地＋ピンクの枠） */
+.open-chat-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1.5px solid #ff9cbd;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--pink) !important;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--shadow-small);
+    transition: background .2s, transform .2s;
+}
+
+.open-chat-button:hover {
+    background: var(--pink-soft);
+    transform: translateY(-1px);
+}
+
+.open-chat-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .35);
+    outline-offset: 3px;
+}
+
+.open-chat-button:disabled {
+    border-color: var(--border);
+    color: #8a96aa !important;
+    background: #f1f4f9;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 交流したい参加者の人数 */
+.participant-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 14px 24px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: var(--shadow-small);
+}
+
+.count-number {
+    color: var(--pink);
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.count-label {
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   自分が「今は交流したくない」のとき
+   ======================================== */
+
+.status-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border: 1px solid #ffc1d6;
+    border-radius: 14px;
+    background: var(--pink-soft);
+}
+
+.status-warning .notice-icon {
+    background: var(--pink);
+}
+
+.status-warning p {
+    margin: 0;
+    color: var(--navy);
     font-size: 13px;
     line-height: 1.8;
 }
 
-
-/* ========================================
-   Participant Count
-   ======================================== */
-
-.participant-count {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    padding: 14px 18px;
-
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-medium);
-
-    white-space: nowrap;
-    
-}
-
-.count-number {
-    color: var(--primary-color);
-
-    font-size: 27px;
+.status-warning a {
+    display: inline-block;
+    color: var(--pink) !important;
     font-weight: 700;
-    line-height: 1;
-}
-
-.count-label {
-    color: var(--text-secondary);
-    font-size: 12px;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
 }
 
 
 /* ========================================
-   Search Panel
+   Search（.form-card と同じ白いカード）
    ======================================== */
 
 .search-panel {
-    margin-bottom: 32px;
-    padding: 24px;
-
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-large);
-    box-shadow: var(--shadow-card);
+    margin-bottom: 30px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: var(--shadow);
 }
 
 .search-form {
-    width: 100%;
+    margin: 0;
 }
 
 .search-label {
     display: block;
-    margin-bottom: 10px;
-
-    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--navy);
+    font-size: 13px;
     font-weight: 700;
 }
 
 .search-input-group {
     display: flex;
     gap: 10px;
-    width: 100%;
 }
 
 .search-input-group input {
     flex: 1;
     min-width: 0;
     height: 46px;
-
     padding: 0 14px;
-
-    color: var(--text-primary);
-    background: #ffffff;
-
-    border: 1px solid #dcd8d3;
-    border-radius: var(--radius-small);
-
-    font-family: inherit;
-    font-size: 13px;
-
+    border: 1px solid var(--border);
+    border-radius: 10px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #ffffff;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    transition: border-color .2s, box-shadow .2s;
 }
 
 .search-input-group input::placeholder {
-    color: #a3a09c;
+    color: #9aa6b8;
 }
 
 .search-input-group input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(237, 118, 40, 0.10);
+    border-color: #7da7f7;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
 }
 
 .search-button {
-    min-width: 96px;
+    flex-shrink: 0;
+    min-width: 90px;
     height: 46px;
-
-    padding: 0 22px;
-
+    padding: 0 20px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #f01862, #e80d59);
     color: #ffffff;
-    background: var(--primary-color);
-
-    border: none;
-    border-radius: var(--radius-small);
-
-    font-family: inherit;
+    font: inherit;
     font-size: 14px;
-    font-weight: 600;
-
+    font-weight: 800;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 6px 14px rgba(237, 23, 96, .18);
+    transition: transform .2s, box-shadow .2s;
 }
 
 .search-button:hover {
-    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 9px 18px rgba(237, 23, 96, .24);
 }
 
 
 /* ========================================
-   Filters
+   Filter
    ======================================== */
 
 .filter-section {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-
-    margin-top: 22px;
-    padding-top: 20px;
-
-    border-top: 1px solid #f0eeeb;
+    align-items: center;
+    gap: 14px 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
 }
 
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .filter-label {
-    color: var(--text-secondary);
-
-    font-size: 12px;
+    color: var(--navy);
+    font-size: 13px;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .filter-select {
-    min-width: 130px;
-    height: 36px;
-
-    padding: 0 32px 0 12px;
-
-    color: var(--text-primary);
-    background-color: #ffffff;
-
-    border: 1px solid #e1ddd8;
-    border-radius: var(--radius-small);
-
-    font-family: inherit;
-    font-size: 12px;
-
-    cursor: pointer;
+    min-width: 150px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
     outline: none;
+    background: #ffffff;
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
 }
 
 .filter-select:focus {
-    border-color: var(--primary-color);
+    border-color: #7da7f7;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+.clear-link {
+    margin-left: auto;
+    color: var(--muted) !important;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+}
+
+.clear-link:hover {
+    color: var(--pink) !important;
 }
 
 
 /* ========================================
-   Participant Section
+   List Heading
    ======================================== */
 
 .participant-section {
-    width: 100%;
+    margin-bottom: 26px;
 }
 
 .list-heading {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 16px;
-
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .list-heading h2 {
     margin: 0;
-
-    font-size: 18px;
-    font-weight: 700;
+    color: var(--navy);
+    font-size: 19px;
 }
 
 .list-description {
-    color: var(--text-secondary);
-    font-size: 12px;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 
@@ -308,30 +381,36 @@
 
 .participant-card {
     display: grid;
-    grid-template-columns: 68px minmax(0, 1fr) 140px;
+    grid-template-columns: minmax(0, 1fr) 150px;
     align-items: center;
     gap: 20px;
-
-    min-height: 126px;
-    padding: 20px 22px;
-
-    background: var(--surface-color);
-
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-medium);
-
-    box-shadow: var(--shadow-card);
-
-    transition:
-        border-color 0.2s,
-        box-shadow 0.2s,
-        transform 0.2s;
+    padding: 18px 22px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: var(--shadow-small);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
 
 .participant-card:hover {
-    border-color: #edc4a5;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.055);
+    border-color: #ffc1d6;
+    box-shadow: 0 12px 28px rgba(28, 48, 91, .11);
     transform: translateY(-1px);
+}
+
+/* アイコン〜一言をまとめたリンク（押すとプロフィール） */
+.participant-link {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+    border-radius: 14px;
+}
+
+.participant-link:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .35);
+    outline-offset: 4px;
 }
 
 
@@ -343,31 +422,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 64px;
     height: 64px;
-
-    border-radius: 12px;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px #ffd3e2;
+    overflow: hidden;
 }
 
 .participant-avatar span {
     color: #ffffff;
-
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
-.avatar-orange {
-    background: #ed874b;
+.participant-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.avatar-green {
-    background: #65a99d;
-}
-
-.avatar-blue {
-    background: #8298b7;
-}
+.avatar-orange { background: linear-gradient(135deg, #ff6b9d, var(--pink)); }
+.avatar-green  { background: linear-gradient(135deg, #7c9cf5, #4569d6); }
+.avatar-blue   { background: linear-gradient(135deg, #b48cf0, #8257d6); }
 
 
 /* ========================================
@@ -379,78 +456,72 @@
 }
 
 .participant-name-row {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .participant-name-row h3 {
     margin: 0;
-
-    font-size: 15px;
-    font-weight: 700;
+    color: var(--navy);
+    font-size: 16px;
     line-height: 1.6;
-
     overflow-wrap: anywhere;
 }
 
-
+/* 年代 */
 .reading {
-    color: var(--text-secondary);
-
+    margin-left: 6px;
+    color: var(--muted);
     font-size: 12px;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 
 /* ========================================
-   Hobby Tags
+   Hobby Tags（.tag-label と同じ形）
    ======================================== */
 
 .hobby-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-
-    margin-bottom: 9px;
+    margin-bottom: 8px;
 }
 
 .hobby-tag {
     display: inline-flex;
     align-items: center;
-
-    min-height: 26px;
-    padding: 5px 11px;
-
-    color: #75543d;
-    background: var(--tag-background);
-
-    border-radius: 4px;
-
-    font-size: 11px;
-    font-weight: 500;
+    padding: 4px 11px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: #ffffff;
+    color: var(--text);
+    font-size: 12px;
 }
 
-/* 共通する趣味タグの表示用 */
+/* 自分と共通の興味 */
 .hobby-tag.is-common {
-    color: #247563;
-    background: #dcefe9;
-
+    border-color: #ff9cbd;
+    background: var(--pink-soft);
+    color: var(--pink);
     font-weight: 700;
+}
+
+.hobby-tag.is-common::before {
+    content: "✓";
+    margin-right: 4px;
 }
 
 .participant-introduction {
     margin: 0;
-
-    color: var(--text-secondary);
-
-    font-size: 12px;
-    line-height: 1.8;
-
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
     overflow-wrap: anywhere;
 }
 
 
 /* ========================================
-   Chat Button
+   Chat Button（.btn-submit と同じ）
    ======================================== */
 
 .participant-action {
@@ -463,27 +534,32 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     width: 100%;
-    min-height: 40px;
-
-    padding: 10px 12px;
-
-    color: #ffffff;
-    background: var(--primary-color);
-
-    border-radius: var(--radius-small);
-
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-
-    transition: background 0.2s;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f01862, #e80d59);
+    color: #ffffff !important;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(237, 23, 96, .18);
+    transition: transform .2s, box-shadow .2s;
 }
 
 .chat-button:hover {
-    color: #ffffff;
-    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 9px 18px rgba(237, 23, 96, .24);
+}
+
+.chat-button:disabled {
+    background: #e4e9f2;
+    color: #8a96aa !important;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
 }
 
 
@@ -492,12 +568,10 @@
    ======================================== */
 
 .empty-message {
-    padding: 48px 20px;
-
-    background: #ffffff;
-    border: 1px dashed #ded8d1;
-    border-radius: var(--radius-medium);
-
+    padding: 44px 20px;
+    border: 1.5px dashed #ffc1d6;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .8);
     text-align: center;
 }
 
@@ -506,215 +580,222 @@
 }
 
 .empty-icon {
-    margin-bottom: 12px;
-
-    color: #b4aca3;
-    font-size: 32px;
+    margin-bottom: 10px;
+    color: var(--pink);
+    font-size: 30px;
 }
 
 .empty-message h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
+    margin: 0 0 6px;
+    color: var(--navy);
+    font-size: 16px;
 }
 
 .empty-message p {
     margin: 0;
-
-    color: var(--text-secondary);
-    font-size: 12px;
-    line-height: 1.8;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 
 /* ========================================
-   List Footer
+   List Footer（ほかにも○名）
    ======================================== */
 
 .list-footer {
-    padding: 28px 0;
-
+    margin-top: 18px;
     text-align: center;
 }
 
 .list-footer p {
-    margin: 0;
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
 
-    color: var(--text-secondary);
-    font-size: 12px;
+.show-all-link {
+    display: inline-block;
+    padding: 9px 22px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--navy) !important;
+    font-size: 13px;
+    font-weight: 700;
+    transition: border-color .2s, color .2s;
+}
+
+.show-all-link:hover {
+    border-color: #ff9cbd;
+    color: var(--pink) !important;
 }
 
 
 /* ========================================
-   Notice
+   Notice（.info-box と同じ）
    ======================================== */
 
 .participant-notice {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-
-    margin-top: 8px;
-    padding: 16px 18px;
-
-    background: #ffffff;
-
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-medium);
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #f0f4ff;
 }
 
 .notice-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     flex-shrink: 0;
-
-    width: 18px;
-    height: 18px;
-
-    color: #ffffff;
-    background: #a6a19b;
-
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-
-    font-size: 11px;
-    font-weight: 700;
+    background: #4569d6;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .participant-notice p {
     margin: 0;
-
-    color: var(--text-secondary);
-
-    font-size: 11px;
+    color: #40516e;
+    font-size: 12px;
     line-height: 1.8;
 }
 
 
 /* ========================================
-   Responsive Design
+   Event Materials / My Profile
+   ======================================== */
+
+.event-materials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.event-materials-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 22px;
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    background: #ffffff;
+    color: var(--navy) !important;
+    font-size: 14px;
+    font-weight: 700;
+    transition: border-color .2s, color .2s;
+}
+
+.event-materials-link:hover {
+    border-color: #ff9cbd;
+    color: var(--pink) !important;
+}
+
+.link-arrow {
+    color: var(--pink);
+    font-size: 16px;
+}
+
+
+/* ========================================
+   スマートフォン
    ======================================== */
 
 @media (max-width: 700px) {
 
     .participant-page {
         width: calc(100% - 32px);
-        padding: 26px 0 40px;
+        padding: 22px 0 36px;
     }
 
     .page-heading {
-        align-items: flex-start;
         flex-direction: column;
-        gap: 18px;
-
-        margin-bottom: 22px;
+        align-items: stretch;
+        gap: 16px;
+        margin-bottom: 20px;
     }
 
-    .page-heading h1 {
-        font-size: 24px;
+    /* スマホでは人数とボタンを横に並べる */
+    .heading-side {
+        flex-direction: row;
     }
 
     .participant-count {
-        padding: 12px 15px;
+        flex: 1;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+
+    .open-chat-button {
+        flex: 1;
+        border-radius: 18px;
+    }
+
+    .count-number {
+        font-size: 24px;
     }
 
     .search-panel {
-        padding: 18px;
-        margin-bottom: 26px;
-    }
-
-    .filter-section {
-        gap: 14px;
+        padding: 18px 16px;
+        border-radius: 18px;
     }
 
     .filter-group {
         width: 100%;
-        justify-content: space-between;
+    }
+
+    .filter-label {
+        width: 36px;
     }
 
     .filter-select {
         flex: 1;
-        max-width: 230px;
+        min-width: 0;
+    }
+
+    .clear-link {
+        margin-left: 0;
     }
 
     .list-heading {
-        align-items: flex-start;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
     }
 
     .participant-card {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .participant-link {
         grid-template-columns: 54px minmax(0, 1fr);
         gap: 14px;
-
-        padding: 18px 14px;
     }
 
     .participant-avatar {
-        width: 52px;
-        height: 52px;
+        width: 54px;
+        height: 54px;
     }
 
     .participant-avatar span {
         font-size: 21px;
     }
 
-    .participant-information {
-        align-self: center;
+    .event-materials-link {
+        flex: 1 1 100%;
+        justify-content: center;
     }
-
-    .participant-action {
-        grid-column: 2;
-        justify-content: flex-start;
-    }
-
-    .chat-button {
-        width: auto;
-        min-width: 130px;
-    }
-
 }
-
-/* Event Materials */
-.event-materials {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 100%;
-    margin-top: 32px;
-    padding: 20px 24px;
-
-}
-
-.event-materials-link {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    width: 150px;
-    padding: 14px 18px;
-    color: var(--text-primary);
-    background: #f8f7f5;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.2s, border-color 0.2s;
-    text-align: center;
-}
-
-.event-materials-link:hover {
-    background: #fff1e6;
-    border-color: var(--primary-color);
-}
-
-.link-arrow {
-    color: var(--primary-color);
-    font-size: 16px;
-}
-
 
 @media (max-width: 400px) {
 
@@ -726,24 +807,8 @@
         gap: 6px;
     }
 
-    .search-input-group input {
-        padding: 0 10px;
-        font-size: 11px;
-    }
-
     .search-button {
-        min-width: 66px;
-        padding: 0 12px;
+        min-width: 70px;
+        padding: 0 14px;
     }
-
-    .participant-card {
-        gap: 10px;
-        padding: 14px 10px;
-    }
-
-    .hobby-tag {
-        padding: 5px 8px;
-        font-size: 10px;
-    }
-
 }

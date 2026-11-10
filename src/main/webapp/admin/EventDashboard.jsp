@@ -107,6 +107,43 @@
             color: #7184a0;
             font-size: 14px;
         }
+        
+                .event-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .event-row a {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0 !important;
+        }
+        .delete-form {
+            margin: 0;
+        }
+        .delete-button {
+            padding: 10px 14px;
+            color: #d64545;
+            background: #ffffff;
+            border: 1px solid #f3c2c2;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background: #fff1f1;
+            border-color: #d64545;
+        }
+        .list-flash {
+            margin: 0 0 12px;
+            padding: 10px 14px;
+            color: #1f7a4d;
+            background: #eefaf3;
+            border-radius: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -162,8 +199,8 @@
                 <% if (ev != null) { %>
                     <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/EventEdit.action?eventId=<%= ev.getEventId() %>'">編集</button>
                     <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/SurveyResult.action?eventId=<%= ev.getEventId() %>'">アンケート結果</button>
-                    <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/QRCode.jsp'">QRコード</button>
-                    <button type="button" class="btn btn-primary" onclick="location.href='<%= ctx %>/admin/Notification.jsp'">お知らせ配信</button>
+                    <button type="button" class="btn" onclick="location.href='<%= ctx %>/admin/qrCode.jsp'">QRコード</button>
+                    <button type="button" class="btn btn-primary" onclick="location.href='<%= ctx %>/NoticePostAction?eventId=<%= ev.getEventId() %>'">お知らせ配信</button>
                     <button type="button" class="btn btn-danger" onclick="location.href='<%= ctx %>/admin/EventEnd.jsp'">イベント終了</button>
                 <% } %>
                 </div>
@@ -213,13 +250,20 @@
             <!-- イベント一覧（クリックするとそのイベントをダッシュボードに表示） -->
             <section class="panel event-list-panel" aria-label="イベント一覧">
                 <h3>イベント一覧</h3>
+                
+               	<% String flash = (String) session.getAttribute("dashboardFlash");
+               			session.removeAttribute("dashboardFlash");
+               			
+               if (flash != null) { %>
+                <p class="list-flash"><%= h(flash) %></p>
+            <% } %>
             <% if (eventList.isEmpty()) { %>
                 <p class="list-empty">まだイベントがありません。</p>
             <% } else { %>
                 <ul class="event-list">
                 <% for (EventDashboardBean item : eventList) {
                        boolean current = (ev != null && ev.getEventId() == item.getEventId()); %>
-                    <li>
+                     <li class="event-row">
                         <a href="<%= ctx %>/admin/EventDashboard.action?eventId=<%= item.getEventId() %>"
                            class="<%= current ? "is-current" : "" %>"
                            <%= current ? "aria-current=\"page\"" : "" %>>
@@ -229,6 +273,11 @@
                             </span>
                             <span class="list-status"><%= h(item.getEventStatus()) %></span>
                         </a>
+                        <form action="<%= ctx %>/admin/EventDelete.action" method="post" class="delete-form"
+                              onsubmit="return confirm('「<%= h(item.getEventName()).replace("\\", "\\\\") %>」を削除しますか？\n参加者・チャット・アンケートもすべて消えます。');">
+                            <input type="hidden" name="eventId" value="<%= item.getEventId() %>">
+                            <button type="submit" class="delete-button">削除</button>
+                        </form>
                     </li>
                 <% } %>
                 </ul>

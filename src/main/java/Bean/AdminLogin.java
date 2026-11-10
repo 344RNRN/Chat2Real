@@ -3,7 +3,6 @@ package Bean;
 
 import java.io.Serializable;
 
-
 public class AdminLogin implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -8,5 +8,6 @@
         url="jdbc:postgresql://localhost:5432/chat2real"
         username="postgres"
         password="pass"
+        
     />
 </Context>

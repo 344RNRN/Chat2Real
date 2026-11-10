@@ -1088,3 +1088,10 @@ body {
         margin-right: 0;
     }
 }
+
+/* パスワードの「表示」ボタン（ログイン画面と同じ小さい文字） */
+.password-toggle {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}

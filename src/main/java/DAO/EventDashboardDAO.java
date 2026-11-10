@@ -158,4 +158,70 @@ public class EventDashboardDAO {
         b.setEventStatus(rs.getString("event_status"));
         return b;
     }
+    
+    /** イベントと、そのイベントのデータをまとめて削除。自分のイベントでなければ null（何も消さない） */
+    public String delete(long eventId, long accountId) throws SQLException {
+        String ep    = "SELECT event_participant_id FROM public.t006_events_participant WHERE event_id = ?";
+        String chats = "SELECT chat_id FROM public.t010_chats WHERE event_id = ?";
+
+        String[] sqls = {
+            "DELETE FROM public.t004_2_survey_answers WHERE question_id IN "
+                + "(SELECT question_id FROM public.t004_survey_questions WHERE event_id = ?) "
+                + "OR event_participant_id IN (" + ep + ")",
+            "DELETE FROM public.t002_meetup WHERE event_participant_id IN (" + ep + ") "
+                + "OR exchange_request_id IN (SELECT exchange_request_id FROM public.t012_exchange_requests "
+                + "WHERE chat_id IN (" + chats + "))",
+            "DELETE FROM public.t012_exchange_requests WHERE chat_id IN (" + chats + ") "
+                + "OR requester_event_participant_id IN (" + ep + ") "
+                + "OR target_event_participant_id IN (" + ep + ")",
+            "DELETE FROM public.t011_messages WHERE chat_id IN (" + chats + ")",
+            "DELETE FROM public.t014_chat_participants WHERE chat_id IN (" + chats + ") "
+                + "OR event_participant_id IN (" + ep + ")",
+            "DELETE FROM public.t010_chats WHERE event_id = ?",
+            "DELETE FROM public.t009_participant_interests WHERE event_id = ?",
+            "DELETE FROM public.t013_notifications WHERE event_id = ?",
+            "DELETE FROM public.t004_survey_questions WHERE event_id = ?",
+            "DELETE FROM public.t014_event_materials WHERE event_id = ?",
+            "DELETE FROM public.t015_event_interests WHERE event_id = ?",
+            "DELETE FROM public.t006_events_participant WHERE event_id = ?",
+        };
+
+        try (Connection con = DBManager.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                String name;
+                try (PreparedStatement ps = con.prepareStatement(
+                        "SELECT event_name FROM public.t003_events WHERE event_id = ? AND account_id = ? FOR UPDATE")) {
+                    ps.setLong(1, eventId);
+                    ps.setLong(2, accountId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) { con.rollback(); return null; }
+                        name = rs.getString("event_name");
+                    }
+                }
+
+                for (String sql : sqls) {
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        int n = sql.length() - sql.replace("?", "").length();   // ? の数
+                        for (int i = 1; i <= n; i++) ps.setLong(i, eventId);   // ? はすべて event_id
+                        ps.executeUpdate();
+                    }
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM public.t003_events WHERE event_id = ? AND account_id = ?")) {
+                    ps.setLong(1, eventId);
+                    ps.setLong(2, accountId);
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+                return name;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
 }

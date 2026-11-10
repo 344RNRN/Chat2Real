@@ -10,6 +10,12 @@ public class NotificationBean {
     private String notificationText;
     private java.sql.Timestamp createdAt;
 
+    // 添付ファイル（無ければ null）
+    private String attachmentName;   // 元のファイル名（例：会場マップ.pdf）
+    private String attachmentPath;   // 保存先（例：/uploads/materials/xxxx.pdf）
+    private String attachmentType;   // 例：application/pdf、image/png
+    private long attachmentSize;
+
     public NotificationBean() {
     }
 
@@ -58,5 +64,41 @@ public class NotificationBean {
 
     public void setCreatedAt(java.sql.Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getAttachmentName() {
+        return attachmentName;
+    }
+
+    public void setAttachmentName(String attachmentName) {
+        this.attachmentName = attachmentName;
+    }
+
+    public String getAttachmentPath() {
+        return attachmentPath;
+    }
+
+    public void setAttachmentPath(String attachmentPath) {
+        this.attachmentPath = attachmentPath;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
+    }
+
+    public long getAttachmentSize() {
+        return attachmentSize;
+    }
+
+    public void setAttachmentSize(long attachmentSize) {
+        this.attachmentSize = attachmentSize;
+    }
+
+    public boolean hasAttachment() {
+        return attachmentPath != null && !attachmentPath.isEmpty();
     }
 }

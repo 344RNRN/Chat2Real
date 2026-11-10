@@ -1,0 +1,711 @@
+/* ========================================
+   Chat2Real - イベント資料・全体チャット（participants/lounge.jsp）
+   PC：左に資料・右に全体チャット / スマホ：タブで切り替え
+   ※ 色・形は admin-login.css（ログイン画面）・top.css に合わせています
+   ======================================== */
+
+:root {
+    --navy: #173b63;
+    --blue: #3b82f6;
+    --pink: #f45b91;
+    --text: #233b59;
+    --muted: #7184a0;
+    --border: #dce5f1;
+
+    --pink-soft: #fff0f6;
+    --pink-line: #ffd0e1;
+    --blue-soft: #eef4ff;
+    --blue-line: #cfe0fb;
+
+    --pink-gradient: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    --card-shadow: 0 18px 50px rgba(40, 66, 105, 0.08);
+    --card-radius: 22px;
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+body.lounge-screen {
+    overflow-x: hidden;
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+
+    background:
+        radial-gradient(circle at 6% 18%, rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%, rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%, rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+.lounge-page {
+    flex: 1;
+    width: min(100% - 48px, 1120px);
+    margin: 0 auto;
+    padding: 32px 0 56px;
+    box-sizing: border-box;
+}
+
+.lounge-page *,
+.lounge-page *::before,
+.lounge-page *::after {
+    box-sizing: border-box;
+}
+
+.lounge-page a {
+    text-decoration: none;
+}
+
+.lounge-page button:focus-visible,
+.lounge-page a:focus-visible,
+.lounge-page textarea:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.55);
+    outline-offset: 2px;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   見出し・今の状態
+   ======================================== */
+
+.lounge-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 5px 13px;
+
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.lounge-heading h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: clamp(22px, 3.2vw, 30px);
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+}
+
+.page-description {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.status-box {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
+    margin: 0;
+    padding: 8px 8px 8px 16px;
+
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(40, 66, 105, 0.06);
+}
+
+.status-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    background: #f0a35e;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(240, 163, 94, 0.18);
+}
+
+.status-dot.want {
+    background: var(--pink);
+    box-shadow: 0 0 0 4px rgba(244, 91, 145, 0.18);
+}
+
+.want-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 42px;
+    padding: 0 16px;
+
+    color: var(--pink);
+    background: #ffffff;
+    border: 1px solid var(--pink-line);
+    border-radius: 11px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.want-button:hover {
+    background: var(--pink-soft);
+    border-color: var(--pink);
+    transform: translateY(-1px);
+}
+
+
+/* ========================================
+   タブ（スマホだけ表示）
+   ======================================== */
+
+.lounge-tabs {
+    display: none;
+    gap: 6px;
+    margin-bottom: 14px;
+    padding: 5px;
+
+    background: #f5f8ff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.lounge-tab {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    min-height: 46px;
+
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.lounge-tab.is-active {
+    color: var(--pink);
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(40, 66, 105, 0.10);
+}
+
+.tab-count {
+    min-width: 22px;
+    padding: 1px 7px;
+
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-radius: 999px;
+
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   2カラム（PC）
+   ======================================== */
+
+.lounge-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 24px;
+
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(222, 231, 243, 0.9);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+/* PC：画面の高さに合わせて、中だけスクロール */
+.docs-panel,
+.chat-panel {
+    height: clamp(460px, calc(100vh - 290px), 680px);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+
+    color: var(--navy);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.member-count {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.panel-empty {
+    margin: 24px 0;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* ========================================
+   左：お知らせ・資料
+   ======================================== */
+
+.doc-list {
+    flex: 1;
+    margin: 0;
+    padding: 0 4px 0 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.doc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #edf1f7;
+}
+
+.doc-item:last-child {
+    border-bottom: none;
+}
+
+.doc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-radius: 12px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.doc-icon.kind-notice {
+    color: var(--pink);
+    background: var(--pink-soft);
+}
+
+.doc-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.doc-title {
+    margin: 0;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.doc-link:hover {
+    color: var(--pink);
+    text-decoration: underline;
+}
+
+.doc-text {
+    margin: 0;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.doc-meta {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+
+/* お知らせの添付ファイル（押すと別タブで開く） */
+.doc-attachment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin: 8px 0 4px;
+    padding: 10px 12px;
+
+    color: var(--navy);
+    background: #f5f8ff;
+    border: 1px solid var(--blue-line);
+    border-radius: 12px;
+
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.doc-attachment:hover {
+    background: #ffffff;
+    border-color: var(--blue);
+    transform: translateY(-1px);
+}
+
+.attachment-kind {
+    flex-shrink: 0;
+    padding: 3px 8px;
+
+    color: #ffffff;
+    background: var(--blue);
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.attachment-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-open {
+    flex-shrink: 0;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* ========================================
+   右：全体チャット
+   ======================================== */
+
+.message-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    padding: 4px 6px 4px 0;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.chat-empty {
+    margin: auto 0;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+}
+
+.msg {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 78%;
+    margin-top: 6px;
+}
+
+.msg.mine {
+    align-items: flex-end;
+    align-self: flex-end;
+}
+
+.msg-name {
+    margin: 0 0 3px 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.msg-text {
+    margin: 0;
+    padding: 10px 14px;
+
+    color: var(--text);
+    background: #f1f4f9;
+    border-radius: 4px 16px 16px 16px;
+
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.msg.mine .msg-text {
+    color: #ffffff;
+    background: var(--pink-gradient);
+    border-radius: 16px 4px 16px 16px;
+}
+
+.msg-time {
+    margin: 3px 4px 0;
+    color: #a2afc1;
+    font-size: 10px;
+}
+
+.chat-flash {
+    margin: 10px 0 0;
+    padding: 9px 12px;
+
+    color: #c62828;
+    background: #fff1f2;
+    border-radius: 10px;
+
+    font-size: 13px;
+}
+
+.chat-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 14px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid #edf1f7;
+}
+
+.chat-form textarea {
+    flex: 1;
+    min-height: 48px;
+    max-height: 120px;
+    padding: 13px 15px;
+
+    color: var(--text);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    resize: none;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chat-form textarea::placeholder {
+    color: #a2afc1;
+}
+
+.chat-form textarea:focus {
+    border-color: #8db5f0;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+    outline: none;
+}
+
+.send-button {
+    flex-shrink: 0;
+    min-height: 48px;
+    padding: 0 22px;
+
+    color: #ffffff;
+    background: var(--pink-gradient);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.send-button:hover {
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(244, 91, 145, 0.28);
+}
+
+.chat-hint {
+    margin: 6px 0 0;
+    color: #a2afc1;
+    font-size: 11px;
+    text-align: right;
+}
+
+
+/* ========================================
+   下のリンク
+   ======================================== */
+
+.lounge-links {
+    display: flex;
+    justify-content: center;
+    margin-top: 26px;
+}
+
+.room-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 22px;
+
+    color: var(--navy);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.room-link:hover {
+    color: var(--pink);
+    border-color: var(--pink-line);
+}
+
+
+/* ========================================
+   タブレット・スマートフォン（900px 以下）：タブで切り替え
+   ======================================== */
+
+@media (max-width: 900px) {
+
+    .lounge-page {
+        width: calc(100% - 32px);
+        padding: 22px 0 36px;
+    }
+
+    .lounge-heading {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    /* 状態は1行にコンパクトに */
+    .status-box {
+        justify-content: space-between;
+        padding: 6px 6px 6px 14px;
+        border-radius: 14px;
+    }
+
+    .want-button {
+        min-height: 38px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .lounge-tabs {
+        display: flex;
+    }
+
+    .lounge-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* 選んでいるタブの方だけ表示 */
+    .lounge-grid[data-tab="docs"] .chat-panel,
+    .lounge-grid[data-tab="chat"] .docs-panel {
+        display: none;
+    }
+
+    .panel {
+        padding: 20px 18px;
+        border-radius: 20px;
+    }
+
+    .docs-panel {
+        height: auto;
+    }
+
+    .doc-list {
+        overflow: visible;
+    }
+
+    /* チャットは画面の高さいっぱい（入力欄が画面に収まるように） */
+    .chat-panel {
+        height: calc(100svh - 130px);
+        min-height: 380px;
+        max-height: 760px;
+        scroll-margin-top: 12px;
+    }
+
+    .chat-hint {
+        display: none;
+    }
+
+    .msg {
+        max-width: 86%;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .lounge-page {
+        width: calc(100% - 24px);
+    }
+
+    .status-text {
+        font-size: 12px;
+    }
+
+    .want-button {
+        font-size: 12px;
+    }
+
+    .send-button {
+        padding: 0 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lounge-page * {
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}

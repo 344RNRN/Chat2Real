@@ -188,6 +188,11 @@
 
             <button type="submit" class="btn-submit">登録する <span>›</span></button>
         </form>
+        
+        <p class="login-switch">
+            すでに登録済みの方は
+            <a href="<%= ctx %>/participant/Login.action?eventId=<%= reg.getEventId() %>">こちらからログイン</a>
+        </p>
     <% } %>
     </section>
 </main>

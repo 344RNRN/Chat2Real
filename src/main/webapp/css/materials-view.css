@@ -1,0 +1,402 @@
+/* ========================================
+   Chat2Real - イベント資料（チャットなし）participants/materialsView.jsp
+   ※ 色・形は admin-login.css（ログイン画面）・lounge.css に合わせています
+   ======================================== */
+
+:root {
+    --navy: #173b63;
+    --blue: #3b82f6;
+    --pink: #f45b91;
+    --text: #233b59;
+    --muted: #7184a0;
+    --border: #dce5f1;
+
+    --pink-soft: #fff0f6;
+    --pink-line: #ffd0e1;
+    --blue-soft: #eef4ff;
+    --blue-line: #cfe0fb;
+
+    --pink-gradient: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    --card-shadow: 0 18px 50px rgba(40, 66, 105, 0.08);
+    --card-radius: 22px;
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
+body.materials-view-screen {
+    overflow-x: hidden;
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+
+    background:
+        radial-gradient(circle at 6% 18%, rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%, rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%, rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+.materials-view-page {
+    flex: 1;
+    width: min(100% - 48px, 760px);
+    margin: 0 auto;
+    padding: 28px 0 56px;
+    box-sizing: border-box;
+}
+
+.materials-view-page *,
+.materials-view-page *::before,
+.materials-view-page *::after {
+    box-sizing: border-box;
+}
+
+.materials-view-page a {
+    text-decoration: none;
+}
+
+.materials-view-page a:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.55);
+    outline-offset: 2px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 18px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.back-link:hover {
+    color: var(--pink);
+}
+
+
+/* ========================================
+   見出し
+   ======================================== */
+
+.page-heading {
+    margin-bottom: 20px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 5px 13px;
+
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.page-heading h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: clamp(24px, 4vw, 30px);
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.page-description {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.summary-chip {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.summary-chip strong {
+    margin-left: 2px;
+    font-size: 14px;
+}
+
+.summary-chip.notice {
+    color: var(--pink);
+    background: var(--pink-soft);
+}
+
+.summary-chip.file {
+    color: var(--blue);
+    background: var(--blue-soft);
+}
+
+
+/* ========================================
+   パネル・一覧
+   ======================================== */
+
+.panel {
+    padding: 24px 26px;
+
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(222, 231, 243, 0.9);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+
+    color: var(--navy);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.panel-empty {
+    padding: 36px 10px 20px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.panel-empty p {
+    margin: 8px 0 0;
+}
+
+.empty-icon {
+    font-size: 34px;
+}
+
+.doc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.doc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #edf1f7;
+}
+
+.doc-item:last-child {
+    border-bottom: none;
+    padding-bottom: 4px;
+}
+
+.doc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 46px;
+    height: 46px;
+
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-radius: 12px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.doc-icon.kind-notice {
+    color: var(--pink);
+    background: var(--pink-soft);
+}
+
+.doc-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.doc-title {
+    margin: 0;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.doc-text {
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.doc-meta {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* ファイル（押すと別タブで開く） */
+.doc-attachment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin: 8px 0 4px;
+    padding: 11px 14px;
+
+    color: var(--navy);
+    background: #f5f8ff;
+    border: 1px solid var(--blue-line);
+    border-radius: 12px;
+
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.doc-attachment.file-only {
+    margin-top: 0;
+}
+
+.doc-attachment:hover {
+    background: #ffffff;
+    border-color: var(--blue);
+    transform: translateY(-1px);
+}
+
+.attachment-kind {
+    flex-shrink: 0;
+    padding: 3px 8px;
+
+    color: #ffffff;
+    background: var(--blue);
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.attachment-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-open {
+    flex-shrink: 0;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.page-note {
+    margin: 14px 4px 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* ========================================
+   下のリンク
+   ======================================== */
+
+.bottom-links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.main-link,
+.sub-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 50px;
+    padding: 0 24px;
+
+    border-radius: 11px;
+    font-size: 15px;
+    font-weight: 800;
+
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.main-link {
+    color: #ffffff;
+    background: var(--pink-gradient);
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
+}
+
+.main-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(244, 91, 145, 0.28);
+}
+
+.sub-link {
+    color: var(--navy);
+    background: #ffffff;
+    border: 1px solid var(--border);
+}
+
+.sub-link:hover {
+    color: var(--pink);
+    border-color: var(--pink-line);
+}
+
+
+/* ========================================
+   スマートフォン
+   ======================================== */
+
+@media (max-width: 700px) {
+
+    .materials-view-page {
+        width: calc(100% - 32px);
+        padding: 20px 0 40px;
+    }
+
+    .panel {
+        padding: 20px 18px;
+        border-radius: 20px;
+    }
+
+    .doc-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 11px;
+    }
+
+    .bottom-links {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .materials-view-page * {
+        transition: none !important;
+    }
+}

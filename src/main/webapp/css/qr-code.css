@@ -1,0 +1,338 @@
+/*
+ * Chat2Real - 参加用QRコード画面
+ * File: src/main/webapp/css/qr-code.css
+ * デザインは admin-login.css / event-create.css（運営者の画面）に合わせています
+ */
+
+:root {
+    --navy: #173b63;
+    --blue: #3b82f6;
+    --pink: #f45b91;
+    --pink-soft: #fff0f6;
+    --text: #233b59;
+    --muted: #7184a0;
+    --border: #dce5f1;
+    --white: #ffffff;
+}
+
+/* header.jsp の body の背景より優先させるため、body にクラスを付けている */
+body.qr-body {
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+    background:
+        radial-gradient(circle at 6% 18%,
+            rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%,
+            rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+.qr-page {
+    flex: 1;
+    width: min(1100px, 94%);
+    margin: 0 auto;
+    padding: 28px 0 44px;
+}
+
+.qr-page *,
+.qr-page *::before,
+.qr-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------- 見出し ---------- */
+.qr-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.page-eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    color: var(--pink);
+    background: var(--pink-soft);
+    border-radius: 13px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.qr-title {
+    margin: 10px 0 0;
+    color: var(--navy);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 800;
+}
+
+.back-button {
+    padding: 10px 18px;
+    color: var(--navy);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.back-button:hover {
+    color: var(--pink);
+    border-color: #f9b6cd;
+}
+
+
+/* ---------- 2カラム ---------- */
+.qr-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.card {
+    padding: 28px 30px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(222, 231, 243, 0.9);
+    border-radius: 22px;
+    box-shadow: 0 18px 50px rgba(40, 66, 105, 0.10);
+}
+
+.card-title {
+    margin: 0 0 18px;
+    padding-left: 12px;
+    border-left: 4px solid var(--pink);
+    color: var(--navy);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+
+/* ---------- QRコード ---------- */
+.qr-card {
+    text-align: center;
+}
+
+.qr-event-name {
+    margin: 0;
+    color: var(--navy);
+    font-size: 22px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.qr-event-meta {
+    margin: 6px 0 18px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.qr-image {
+    width: min(100%, 320px);
+    margin: 0 auto;
+    padding: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.qr-image svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.qr-caption {
+    margin: 16px 0 6px;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.qr-url {
+    margin: 0;
+    color: var(--muted);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+
+/* ---------- ボタン ---------- */
+.button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.main-button,
+.sub-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 18px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* .login-button と同じ */
+.main-button {
+    color: #ffffff;
+    background: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
+    border: none;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.20);
+}
+
+.main-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(244, 91, 145, 0.28);
+}
+
+.sub-button {
+    color: var(--navy);
+    background: var(--white);
+    border: 1px solid var(--border);
+}
+
+.sub-button:hover {
+    color: var(--pink);
+    border-color: #f9b6cd;
+}
+
+.main-button:focus-visible,
+.sub-button:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.55);
+    outline-offset: 3px;
+}
+
+
+/* ---------- アドレスの選択 ---------- */
+.host-form {
+    margin: 0 0 22px;
+}
+
+.host-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.host-form select {
+    width: 100%;
+    min-height: 46px;
+    padding: 8px 12px;
+    color: var(--text);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.hint {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* ---------- 注意・確認 ---------- */
+.alert {
+    margin: 0 0 18px;
+    padding: 12px 15px;
+    color: #c62828;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.check-title {
+    margin: 0 0 8px;
+    color: var(--navy);
+    font-size: 15px;
+}
+
+.check-list {
+    margin: 0;
+    padding: 14px 16px 14px 34px;
+    color: #40516e;
+    background: #f0f4ff;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.check-list li + li {
+    margin-top: 6px;
+}
+
+
+/* ---------- スマートフォン ---------- */
+@media (max-width: 860px) {
+    .qr-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 22px 18px;
+        border-radius: 18px;
+    }
+}
+
+
+/* ---------- 印刷（QRコードのカードだけ） ---------- */
+@media print {
+    body.qr-body {
+        background: #ffffff;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #printArea,
+    #printArea * {
+        visibility: visible;
+    }
+
+    #printArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+
+    .qr-image {
+        width: 12cm;
+        border: none;
+    }
+
+    .qr-event-name {
+        font-size: 26pt;
+    }
+
+    .qr-caption {
+        font-size: 16pt;
+    }
+}

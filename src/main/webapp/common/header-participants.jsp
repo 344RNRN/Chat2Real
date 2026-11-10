@@ -131,7 +131,7 @@
         <div class="header-divider"></div>
 
         <h1 class="system-name">
-            ～チャットからリアルな交流へ
+            ～チャットからリアルな交流へ～
         </h1>
 
     </div>
