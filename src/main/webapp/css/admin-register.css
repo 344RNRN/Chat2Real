@@ -1089,9 +1089,25 @@ body {
     }
 }
 
+<<<<<<< HEAD
 /* パスワードの「表示」ボタン（ログイン画面と同じ小さい文字） */
 .password-toggle {
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+=======
+/* PC：左の紹介と右のカードを中央に寄せて、間を狭くする */
+@media (min-width: 769px) {
+
+    .main-container {
+        grid-template-columns: fit-content(520px) minmax(0, 500px);
+        justify-content: center;
+        gap: 60px;
+    }
+
+    .login-section {
+        justify-self: stretch;
+        margin-right: 0;
+    }
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 }

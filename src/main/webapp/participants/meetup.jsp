@@ -137,7 +137,11 @@
     </p>
 
     <!-- 8. 交流結果を登録する -->
+<<<<<<< HEAD
     <form action="<%= ctx %>/participants/meetResult.jsp" method="get">
+=======
+    <form action="<%= ctx %>/participants/meetResult" method="get">
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
         <input type="hidden" name="exchangeRequestId" value="<%= h(exchangeRequestId) %>">
         <button type="submit" name="resultButton" class="result-button">交流結果を登録する</button>
     </form>

@@ -30,7 +30,7 @@ return "";
   <section class="lo-card">
     <h1 class="lo-title">運営者ログアウト</h1>
     <p class="lo-message">ログアウトしました</p>
-    <div><a class="lo-link" id="loginButton" href="${pageContext.request.contextPath}/admin/Login">ログイン画面に戻る</a></div>
+    <div><a class="lo-link" id="loginButton" href="${pageContext.request.contextPath}/admin/adminLogin.jsp">ログイン画面に戻る</a></div>
   </section>
 </main>
 <%@ include file="/common/footer.jsp" %>

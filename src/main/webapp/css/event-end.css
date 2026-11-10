@@ -1,0 +1,189 @@
+/* ========================================
+   Chat2Real - イベント終了確認画面（admin/eventEnd.jsp）
+   ※ ヘッダー・メニュー・ボタンは event-dashboard.css をそのまま使い、
+     この画面だけの部分をここに書いています
+   ======================================== */
+
+.event-end .end-panel {
+    max-width: 720px;
+    margin: 24px auto 0;
+    padding: 32px 36px;
+}
+
+.event-end .end-event-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 0 0 12px;
+
+    color: var(--d-muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.event-end .end-title {
+    margin: 0 0 16px;
+
+    color: var(--d-navy);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.event-end .end-lead {
+    margin: 0 0 20px;
+
+    color: var(--d-muted);
+    font-size: 14px;
+}
+
+/* 2. 警告文 */
+.event-end .end-warning {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+
+    color: var(--d-red);
+    background: #fdecef;
+    border: 1px solid #f6c5ce;
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.8;
+}
+
+.event-end .end-error {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+
+    color: var(--d-amber-text);
+    background: var(--d-amber-bg);
+    border: 1px solid var(--d-amber-border);
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.event-end .end-subtitle {
+    display: block;
+
+    margin: 0 0 10px;
+
+    color: var(--d-text);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* 3. 集計サマリー */
+.event-end .end-summary {
+    width: 100%;
+    margin-bottom: 24px;
+
+    border-collapse: collapse;
+}
+
+.event-end .end-summary th,
+.event-end .end-summary td {
+    padding: 12px 16px;
+
+    border-bottom: 1px solid var(--d-border);
+
+    font-size: 14px;
+}
+
+.event-end .end-summary th {
+    width: 45%;
+
+    color: var(--d-muted);
+    background: var(--d-bg-soft);
+
+    font-weight: 700;
+    text-align: left;
+}
+
+.event-end .end-summary td {
+    color: var(--d-navy);
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* 4. 次回イベント */
+.event-end .end-select {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+
+    color: var(--d-text);
+    background: var(--d-white);
+    border: 1px solid var(--d-border);
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.event-end .end-hint {
+    margin: 6px 0 20px;
+
+    color: var(--d-muted);
+    font-size: 12px;
+}
+
+/* 5. 確認チェック */
+.event-end .end-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 20px;
+
+    color: var(--d-text);
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.event-end .end-check input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* 6, 7. ボタン */
+.event-end .end-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.event-end .end-buttons .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.event-end .end-note {
+    margin: 16px 0 0;
+
+    color: var(--d-muted);
+    font-size: 12px;
+    text-align: right;
+}
+
+@media (max-width: 700px) {
+
+    .event-end .end-panel {
+        margin-top: 16px;
+        padding: 22px 18px;
+    }
+
+    .event-end .end-buttons {
+        flex-direction: column-reverse;
+    }
+
+    .event-end .end-note {
+        text-align: center;
+    }
+}

@@ -99,8 +99,8 @@ public class EventReportAction extends HttpServlet {
             return;
         }
 
-        // 再読み込みで二重送信されないように GET に戻す
-        redirectToReport(request, response);
+        // 送信完了画面（13-2）へ（再読み込みで二重送信されないようにリダイレクト）
+        response.sendRedirect(request.getContextPath() + "/participant/SurveyComplete.action");
     }
 
     // =========================================================

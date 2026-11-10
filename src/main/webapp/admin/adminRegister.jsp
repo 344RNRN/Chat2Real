@@ -132,8 +132,7 @@
                                    placeholder="英字と数字を含む8文字以上">
 
                             <!-- パスワードの表示／非表示（ログイン画面と同じ） -->
-                            <button type="button" class="password-toggle" id="togglePassword"
-
+                            <button type="button" class="password-toggle" id="togglePassword" data-target="password"
                                     aria-label="パスワードを表示">表示</button>
                         </div>
                     </div>
@@ -170,10 +169,14 @@
 
 <%@ include file="/common/footer.jsp" %>
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 <!-- Password Visibility（パスワード・確認の両方） -->
 
+<<<<<<< HEAD
 <script>
     const passwordInput = document.getElementById("password");
     const toggleButton = document.getElementById("togglePassword");
@@ -188,10 +191,24 @@
             "aria-label",
             isPassword ? "パスワードを隠す" : "パスワードを表示"
         );
+=======
+        button.addEventListener("click", function () {
+            const isPassword = input.type === "password";
+
+            input.type = isPassword ? "text" : "password";
+            input.classList.toggle("is-visible", isPassword);
+            button.textContent = isPassword ? "非表示" : "表示";
+            button.setAttribute("aria-label",
+                isPassword ? "パスワードを隠す" : "パスワードを表示");
+        });
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
     });
 </script>
 
 </body>
 </html>
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 

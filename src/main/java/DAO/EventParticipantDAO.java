@@ -200,6 +200,53 @@ public class EventParticipantDAO {
         return false;
     }
 
+    // ===== 合流画面（current_zone 列） =====
+    // ※ meetup_add_current_zone.sql で追加した列を使う
+    // ※ 他の画面に影響しないように、mapEventParticipant には入れていない
+
+    // 今いるエリアを取得する（まだ合図を送っていないときは null）
+    public String findCurrentZone(long eventParticipantId)
+            throws SQLException {
+
+        String sql =
+                "SELECT current_zone FROM t006_events_participant "
+                + "WHERE event_participant_id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setLong(1, eventParticipantId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("current_zone");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // 今いるエリアを保存する（合図を送る）
+    public boolean updateCurrentZone(
+            long eventParticipantId, String currentZone)
+            throws SQLException {
+
+        String sql =
+                "UPDATE t006_events_participant "
+                + "SET current_zone = ? "
+                + "WHERE event_participant_id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, currentZone);
+            ps.setLong(2, eventParticipantId);
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
  // ResultSetの内容をBeanに詰める
     private EventParticipantBean mapEventParticipant(ResultSet rs)
             throws SQLException {
