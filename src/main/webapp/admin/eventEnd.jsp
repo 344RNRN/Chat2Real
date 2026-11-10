@@ -75,7 +75,8 @@
                 <div class="operator">
                     <span>運営者：<strong><%= h(accountName) %></strong> さん</span>
 
-                    <form action="<%= ctx %>/admin/logout" method="post">
+                    <form action="<%= ctx %>/admin/logout" method="post"
+                          onsubmit="return confirm('ログアウトしますか？');">
                         <button type="submit" class="logout-btn">ログアウト</button>
                     </form>
                 </div>

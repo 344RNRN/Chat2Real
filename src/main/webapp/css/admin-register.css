@@ -1088,3 +1088,18 @@ body {
         margin-right: 0;
     }
 }
+
+/* PC：左の紹介と右のカードを中央に寄せて、間を狭くする */
+@media (min-width: 769px) {
+
+    .main-container {
+        grid-template-columns: fit-content(520px) minmax(0, 500px);
+        justify-content: center;
+        gap: 60px;
+    }
+
+    .login-section {
+        justify-self: stretch;
+        margin-right: 0;
+    }
+}

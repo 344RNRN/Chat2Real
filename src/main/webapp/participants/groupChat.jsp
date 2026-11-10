@@ -92,7 +92,7 @@
 
 </div>
 
-<a href="eventHome.jsp" class="back-button">
+<a href="${pageContext.request.contextPath}/admin/topScreen.jsp" class="back-button">
     イベント画面へ戻る
 </a>
 
