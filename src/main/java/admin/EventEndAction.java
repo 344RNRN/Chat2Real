@@ -9,6 +9,7 @@ import java.util.List;
 import Bean.AccountBean;
 import Bean.AdminLogin;
 import Bean.EventDashboardBean;
+import DAO.EventCloseDAO;
 import DAO.EventDashboardDAO;
 import DAO.EventEndDAO;
 import jakarta.servlet.ServletException;
@@ -90,15 +91,38 @@ public class EventEndAction extends HttpServlet {
             }
         }
 
-        // 4. 終了する（終了状態に更新・次回案内のお知らせを配信）
+        // 4. 終了する
+        //    「10分後に終了」：参加者に「あと10分」を配信 → 10分後に自動で終了（EventCloseScheduler）
+        //    「今すぐ終了」　：すぐ終了にして「終了しました」を配信
+        boolean afterTen = "10min".equals(request.getParameter("endTiming"));
         try {
+            if (afterTen) {
+                String nextTitle = null;
+                String nextText = null;
+                if (nextEvent != null) {
+                    nextTitle = EventEndDAO.NEXT_EVENT_TITLE;
+                    nextText = nextEvent.getEventName() + "\n" + nextEvent.getDateText()
+                             + (nextEvent.getVenue() == null ? "" : "\n" + nextEvent.getVenue());
+                }
+                boolean ok = new EventEndDAO().scheduleEndIn10Minutes(
+                        event.getEventId(), admin.getAccountId(), nextTitle, nextText);
+                if (!ok) {
+                    showError(request, response, "イベントを終了できませんでした。もう一度お試しください。");
+                    return;
+                }
+                // この画面に戻って「○時○分に終了します」を表示
+                response.sendRedirect(request.getContextPath()
+                        + "/admin/EventEnd.action?eventId=" + event.getEventId());
+                return;
+            }
+
             boolean closed = new EventEndDAO()
                     .closeEvent(event.getEventId(), admin.getAccountId(), nextEvent);
-
             if (!closed) {
                 showError(request, response, "イベントを終了できませんでした。もう一度お試しください。");
                 return;
             }
+            new EventCloseDAO().runChecks();          // 「終了しました」のお知らせをすぐ配信
         } catch (SQLException e) {
             throw new ServletException("イベントの終了処理に失敗しました。", e);
         }
@@ -154,6 +178,9 @@ public class EventEndAction extends HttpServlet {
             request.setAttribute("event", event);
             request.setAttribute("nextEvents", nextEvents);
             request.setAttribute("eventEndLoaded", Boolean.TRUE);
+
+            // 「10分後に終了」を押したあとなら終了予定時刻（例：14:35）
+            request.setAttribute("scheduledEnd", new EventCloseDAO().findScheduledEndTime(event.getEventId()));
             return true;
 
         } catch (SQLException e) {

@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 /* =========================================
    Chat2Real - Complete Chat Design
    ========================================= */
@@ -31,24 +29,33 @@
     box-sizing: border-box;
 }
 
-html,
-body {
+/* 個人チャット画面（chat.jsp の <body class="chat-screen">）だけに効かせる
+   ※ 全体チャット（groupChat.jsp）も この chat.css を読むので、body に直接は書かない */
+body.chat-screen {
+    display: flex;
+    flex-direction: column;
+
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh;
     margin: 0;
     padding: 0;
-    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-    color: var(--text);
-}
 
-body {
-    background: var(--background);
     overflow: hidden;
+
+    background: var(--background);
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
 }
 
-button,
-input,
-select {
+/* チャット画面ではフッターを出さない（入力欄の下に入り込むため） */
+body.chat-screen .footer {
+    display: none;
+}
+
+body.chat-screen button,
+body.chat-screen input,
+body.chat-screen select {
     font-family: inherit;
 }
 
@@ -67,11 +74,9 @@ select {
 
     gap: 10px;
 
+    flex: 1;
     width: 100%;
-    height: 100vh;
-    height: 100dvh;
-
-    min-height: 0;
+    min-height: 0;         /* ヘッダーの下の残りの高さぴったり */
 
     padding: 12px;
 
@@ -1190,160 +1195,390 @@ select {
 
 }
 
+
 /* =========================================
-   MOBILE
+   ← ボタン（リンクにしたので下線を消す）・☰ ボタン（スマホだけ）
    ========================================= */
 
-@media screen and (max-width: 650px) {
+body.chat-screen .chat-back {
+    color: var(--primary-dark);
+    text-decoration: none;
+}
 
-    html,
-    body {
-        height: 100%;
-        overflow: hidden;
-    }
+.chat-list-toggle {
+    display: none;
+}
 
-    .chat-layout {
-        display: flex;
-        flex-direction: column;
+/* =========================================
+   左のチャット一覧（<a> にしたので文字色・下線をそろえる）
+   ========================================= */
 
-        gap: 0;
+a.conversation-item {
+    color: inherit;
+    text-decoration: none;
+}
 
-        width: 100%;
-        height: 100vh;
+/* 未読バッジ：一覧の行の右・☰ ボタンの右上（バッジ自体の見た目は common/chat-notify.jsp） */
+body.chat-screen .conversation-top .conversation-time {
+    margin-left: auto;
+}
+
+body.chat-screen .conversation-top .cn-badge {
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+body.chat-screen .chat-list-toggle {
+    position: relative;
+}
+
+body.chat-screen .chat-list-toggle .cn-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+}
+
+/* =========================================
+   AI パネル：出しっぱなしにせず、✨AI を押したときだけ右から出す
+   ========================================= */
+
+body.chat-screen .gemini-panel.ai-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+
+    width: min(380px, 92vw);
+    max-width: none;
+    margin: 0;
+
+    border-radius: 0;
+    background: #FFFFFF;
+    box-shadow: -12px 0 32px rgba(40, 20, 60, .18);
+
+    transform: translateX(105%);
+    visibility: hidden;
+    transition: transform .25s ease, visibility 0s linear .25s;
+}
+
+body.chat-screen .gemini-panel.ai-drawer.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform .25s ease;
+}
+
+.ai-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+
+    background: rgba(48, 37, 60, .28);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+}
+
+.ai-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* =========================================
+   まだだれともチャットしていないとき
+   ========================================= */
+
+.chat-empty-page {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+
+    padding: 48px 16px;
+}
+
+.chat-empty-card {
+    width: min(100%, 460px);
+    padding: 40px 28px;
+
+    text-align: center;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 23px;
+    box-shadow: 0 5px 22px rgba(80, 55, 105, .07);
+}
+
+.chat-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 72px;
+    height: 72px;
+
+    background: var(--primary-light);
+    border-radius: 50%;
+
+    font-size: 32px;
+}
+
+.chat-empty-card h1 {
+    margin: 16px 0 8px;
+    color: var(--text);
+    font-size: 20px;
+}
+
+.chat-empty-card p {
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.chat-empty-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 48px;
+    padding: 0 28px;
+
+    color: #FFFFFF;
+    background: var(--primary);
+    border-radius: 12px;
+
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.chat-empty-button:hover {
+    background: var(--primary-dark);
+}
+
+/* =========================================
+   スマートフォン・タブレット（900px 以下）
+   ヘッダー → 相手 → メッセージ（ここだけスクロール）→ 入力欄 を画面の高さぴったりに
+   ========================================= */
+
+@media screen and (max-width: 900px) {
+
+    /* 見えている部分（Safari のツールバー・キーボードを除いた高さ）にぴったり固定する
+       --app-h / --app-top は chat.jsp の JavaScript が入れる */
+    body.chat-screen {
+        position: fixed;
+        top: var(--app-top, 0px);
+        left: 0;
+        right: 0;
+
         height: 100dvh;
+        height: var(--app-h, 100dvh);
 
-        padding: 0;
-
-        overflow: hidden;
+        background: var(--chat-background);
     }
 
-    /* Hide desktop navigation and conversation list */
+    /* サイトのヘッダーは1行にして小さく */
+    body.chat-screen .header {
+        flex-wrap: nowrap;
+        min-height: 0;
+        padding: 10px 14px;
+        gap: 8px;
+    }
 
-    .app-sidebar,
-    .chat-list-panel {
+    body.chat-screen .header-left {
+        flex-wrap: nowrap;
+    }
+
+    body.chat-screen .logo {
+        font-size: 22px;
+    }
+
+    body.chat-screen .header-divider,
+    body.chat-screen .system-name {
         display: none;
     }
 
-    /* Full screen chat */
+    body.chat-screen .admin-label {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 
-    .chat-main {
+    /* 左メニューは隠す（← で参加者一覧へ） */
+    body.chat-screen .app-sidebar {
+        display: none;
+    }
+
+    body.chat-screen .chat-layout {
         display: flex;
+        flex: 1;
         flex-direction: column;
 
+        gap: 0;
+        min-height: 0;
+        padding: 0;
+
+        grid-template-columns: none !important;
+    }
+
+    body.chat-screen .chat-main {
+        flex: 1;
         width: 100%;
-        height: 100%;
         min-height: 0;
 
         border: none;
         border-radius: 0;
+        box-shadow: none;
     }
 
-    /* Mobile header */
-
-    .chat-head {
-        flex: 0 0 75px;
-        min-height: 75px;
-
-        gap: 7px;
-
-        padding: 8px 10px;
+    /* 相手の名前と 申請・終了 */
+    body.chat-screen .chat-head {
+        flex: 0 0 auto;
+        min-height: 0;
+        gap: 8px;
+        padding: 10px 12px;
     }
 
-    .chat-back {
-        font-size: 23px;
+    body.chat-screen .chat-back,
+    body.chat-screen .chat-list-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        width: 36px;
+        height: 36px;
+        padding: 0;
+
+        color: var(--primary-dark);
+        background: var(--primary-light);
+        border: none;
+        border-radius: 10px;
+
+        font-size: 18px;
+        cursor: pointer;
     }
 
-    .chat-avatar {
+    body.chat-screen .chat-avatar {
         width: 40px;
         height: 40px;
+        font-size: 18px;
     }
 
-    .chat-who h1 {
-        font-size: 15px;
+    body.chat-screen .chat-who h1 {
+        font-size: 16px;
     }
 
-    .chat-who p {
-        font-size: 10px;
+    body.chat-screen .chat-who p,
+    body.chat-screen .online-status {
+        display: none;
     }
 
-    .chat-head-acts {
-        gap: 4px;
-    }
-
-    .chat-head-acts button {
-        height: 36px;
-        padding: 0 9px;
-        font-size: 11px;
-    }
-
-    /* Mobile message scrolling */
-
-    .chat-body {
-        flex: 1 1 0;
-
-        min-height: 0;
-
-        padding: 17px 12px;
-
-        overflow-y: auto;
-        overflow-x: hidden;
-
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .msg {
-        max-width: 88%;
-    }
-
-    .msg p {
-        font-size: 13px;
-    }
-
-    /* Mobile input */
-
-    .chat-send {
-        flex: 0 0 auto;
-
-        min-height: 70px;
-
-        padding: 9px;
+    body.chat-screen .chat-head-acts {
         gap: 6px;
+        flex-shrink: 0;
     }
 
-    .chat-send input[type="text"] {
-        height: 45px;
-        padding: 0 10px;
+    body.chat-screen .chat-head-acts button {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
         font-size: 12px;
     }
 
-    .ai-open,
-    .send-button {
+    body.chat-screen .chat-head-acts .end {
+        color: #C62828;
+        border-color: #FECDD3;
+    }
+
+    /* メッセージ：ここだけスクロール */
+    body.chat-screen .chat-body {
+        padding: 14px 12px;
+    }
+
+    body.chat-screen .msg {
+        max-width: 86%;
+    }
+
+    /* 入力欄：画面のいちばん下（iPhone の下のバーにかからない） */
+    body.chat-screen .chat-send {
+        min-height: 0;
+        gap: 8px;
+        padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    body.chat-screen .chat-send input[type="text"] {
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 22px;
+        font-size: 16px;   /* 16px 未満だと iPhone が入力時に拡大する */
+    }
+
+    body.chat-screen .ai-open,
+    body.chat-screen .send-button {
         width: 44px;
-        height: 45px;
+        height: 44px;
+        border-radius: 50%;
+        font-size: 18px;
     }
 
-    /* Gemini mobile overlay */
+    body.chat-screen .ai-open small {
+        right: 50%;
+        bottom: 2px;
+        transform: translateX(50%);
+    }
 
-    .gemini-panel {
+    /* チャット一覧：☰ を押すと左から出る */
+    body.chat-screen .chat-list-panel {
         position: fixed;
-        z-index: 100;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1001;
 
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
+        display: flex;
 
-        width: calc(100vw - 16px);
+        width: min(320px, 86vw);
 
-        border-radius: 16px;
+        border-radius: 0 23px 23px 0;
+        box-shadow: 12px 0 32px rgba(40, 20, 60, .18);
+
+        transform: translateX(-105%);
+        visibility: hidden;
+        transition: transform .25s ease, visibility 0s linear .25s;
     }
 
-}
-=======
-* {
-    box-sizing: border-box;
+    body.chat-screen .chat-list-panel.is-open {
+        transform: translateX(0);
+        visibility: visible;
+        transition: transform .25s ease;
+    }
 }
 
-body {
+/* iPhone の下のツールバーの分の余白は、chat.jsp の JavaScript が必要なときだけ付ける */
+
+/* キーボードが出て画面が低いとき（スマホ）：サイトのヘッダーを隠して、メッセージを広く */
+@media screen and (max-width: 900px) and (max-height: 520px) {
+    body.chat-screen .header {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.chat-screen .gemini-panel.ai-drawer,
+    body.chat-screen .chat-list-panel,
+    .ai-backdrop {
+        transition: none;
+    }
+}
+
+
+/* =========================================================
+   ここから 全体チャット画面（groupChat.jsp）
+   ※ 個人チャットとクラス名がぶつからないように、body・送信ボタンは範囲をしぼっている
+   ========================================================= */
+
+body:not(.chat-screen) {
     margin: 0;
     font-family: "Meiryo", sans-serif;
     background-color: #f5f7fa;
@@ -1435,7 +1670,7 @@ body {
     font-size: 14px;
 }
 
-.send-button {
+.chat-input-area .send-button {
     width: 100px;
     border: none;
     border-radius: 8px;
@@ -1445,7 +1680,7 @@ body {
     cursor: pointer;
 }
 
-.send-button:hover {
+.chat-input-area .send-button:hover {
     background-color: #357abd;
 }
 
@@ -1465,4 +1700,3 @@ body {
 .back-button:hover {
     background-color: #e8f1fc;
 }
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git

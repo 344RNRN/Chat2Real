@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-<<<<<<< HEAD
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,17 +13,10 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-=======
-import java.util.ArrayList;
-import java.util.List;
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 
 import Bean.ChatBean;
-<<<<<<< HEAD
 import Bean.ChatMessageBean;
 import Bean.ChatPartnerBean;
-=======
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
 import Bean.MessageBean;
 
 /**
@@ -464,7 +456,6 @@ public class ChatDAO {
             return ps.executeUpdate() > 0;
         }
     }
-<<<<<<< HEAD
 
     // =====================================
     // Helper
@@ -500,89 +491,6 @@ public class ChatDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getLong(1) : 0L;
             }
-=======
-    
- // イベントIDから全体チャットIDを取得
-    public long findGroupChatId(long eventId) throws SQLException {
-
-        String sql =
-                "SELECT chat_id FROM t010_chats " +
-                "WHERE event_id = ? AND chat_type = 'group'";
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setLong(1, eventId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong("chat_id");
-                }
-            }
-        }
-
-        return 0;
-    }
- // メッセージ一覧を取得
-    public List<MessageBean> findMessages(long chatId)
-            throws SQLException {
-
-        List<MessageBean> list = new ArrayList<>();
-
-        String sql =
-                "SELECT message_id, chat_id, sender_participant_id, " +
-                "message_text, sent_at " +
-                "FROM t011_messages " +
-                "WHERE chat_id = ? " +
-                "ORDER BY sent_at ASC";
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setLong(1, chatId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    MessageBean message = new MessageBean();
-
-                    message.setMessageId(rs.getLong("message_id"));
-                    message.setChatId(rs.getLong("chat_id"));
-                    message.setSenderParticipantId(
-                            rs.getLong("sender_participant_id"));
-                    message.setMessageText(
-                            rs.getString("message_text"));
-                    message.setSentAt(
-                            rs.getTimestamp("sent_at"));
-
-                    list.add(message);
-                }
-            }
-        }
-
-        return list;
-    }
- // メッセージを登録
-    public boolean insertMessage(MessageBean message)
-            throws SQLException {
-
-        String sql =
-                "INSERT INTO t011_messages " +
-                "(chat_id, sender_participant_id, message_text) " +
-                "VALUES (?, ?, ?)";
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setLong(1, message.getChatId());
-            ps.setLong(2, message.getSenderParticipantId());
-            ps.setString(3, message.getMessageText());
-
-            return ps.executeUpdate() > 0;
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
         }
     }
 }
-
-

@@ -56,138 +56,11 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <title>チャット | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=3">
-    <style>
-        /* ===== AI パネル：横に出しっぱなしにせず、押したときだけ右から出す ===== */
-        .gemini-panel.ai-drawer {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-
-            width: min(380px, 92vw);
-            max-width: none;
-            margin: 0;
-            overflow-y: auto;
-
-            background: #ffffff;
-            box-shadow: -12px 0 32px rgba(40, 66, 105, 0.18);
-
-            transform: translateX(105%);
-            visibility: hidden;
-            transition: transform 0.25s ease, visibility 0s linear 0.25s;
-        }
-
-        .gemini-panel.ai-drawer.is-open {
-            transform: translateX(0);
-            visibility: visible;
-            transition: transform 0.25s ease;
-        }
-
-        .ai-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-            background: rgba(23, 59, 99, 0.25);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-
-        .ai-backdrop.is-open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .gemini-panel.ai-drawer,
-            .ai-backdrop {
-                transition: none;
-            }
-        }
-
-        /* ===== 左のチャット一覧：<a> にしたので文字色・下線をそろえる ===== */
-        a.conversation-item {
-            display: flex;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        a.conversation-item[hidden] {
-            display: none;
-        }
-
-        .conversation-info p {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ===== まだだれともチャットしていないとき ===== */
-        .chat-empty-page {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 16px;
-        }
-
-        .chat-empty-card {
-            width: min(100%, 460px);
-            padding: 40px 28px;
-
-            text-align: center;
-            background: #ffffff;
-            border: 1px solid #dce5f1;
-            border-radius: 22px;
-            box-shadow: 0 18px 50px rgba(40, 66, 105, 0.08);
-        }
-
-        .chat-empty-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 72px;
-            height: 72px;
-            font-size: 32px;
-            background: #fff0f6;
-            border-radius: 50%;
-        }
-
-        .chat-empty-card h1 {
-            margin: 16px 0 8px;
-            color: #173b63;
-            font-size: 20px;
-        }
-
-        .chat-empty-card p {
-            margin: 0 0 24px;
-            color: #7184a0;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-
-        .chat-empty-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 48px;
-            padding: 0 28px;
-
-            color: #ffffff;
-            background: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
-            border-radius: 11px;
-            box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
-
-            font-weight: 800;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=8">
 </head>
-<body>
+<body class="chat-screen">
 
 <%-- 参加者用ヘッダー --%>
 <%@ include file="/common/header-participants.jsp" %>
@@ -232,7 +105,7 @@
 
 
     <!-- 02. CONVERSATION LIST -->
-    <aside class="chat-list-panel">
+    <aside class="chat-list-panel" id="chatListPanel">
 
         <div class="list-heading">
             <h2>チャット</h2>
@@ -278,6 +151,7 @@
                     <div class="conversation-top">
                         <strong><%= h(cv.getDisplayName()) %></strong>
                         <span class="conversation-time"><%= h(cv.getTimeText()) %></span>
+                        <span class="cn-badge" data-unread-partner="<%= cv.getPartnerId() %>"<%= cv.getUnreadCount() > 0 ? "" : " hidden" %>><%= cv.getUnreadCount() %></span>
                     </div>
                     <p><%= cv.isEnded() ? "【終了】" : "" %><%= h(cv.getPreview()) %></p>
                 </div>
@@ -318,9 +192,14 @@
 
         <header class="chat-head">
 
-            <button type="button" class="chat-back"
-                    onclick="history.back()" aria-label="戻る">
+            <a class="chat-back" href="<%= ctx %>/participant/ParticipantList.action" aria-label="参加者一覧に戻る">
                 ←
+            </a>
+
+            <button type="button" class="chat-list-toggle" id="chatListToggle"
+                    aria-label="チャット一覧" aria-controls="chatListPanel" aria-expanded="false">
+                ☰
+                <span class="cn-badge" id="chatUnreadBadge" hidden>0</span>
             </button>
 
             <a class="chat-avatar" href="<%= ctx %>/participant/AccountProfile.action?id=<%= partnerId %>"
@@ -506,6 +385,100 @@
     }
 
     scrollBottom();
+    // ===== スマホ：画面に「見えている」高さに合わせる =====
+    // iPhone の Safari は、下のツールバーやキーボードの後ろまで画面の高さに数えるので、
+    // そのままだと入力欄が隠れる。見えている高さ（visualViewport）を --app-h に入れて、その高さにする
+    const vv = window.visualViewport;
+    const root = document.documentElement;
+
+    // iPhone・iPad：画面の下に浮いているツールバー（＜・共有・更新）の分、入力欄を上げる（CSS の .is-ios）
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+            || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIOS) root.classList.add("is-ios");
+
+    let fullHeight = window.innerHeight;
+    const sendBar = document.getElementById("sendForm");
+    const phone = window.matchMedia("(max-width: 900px)");
+
+    // iPhone の下に浮いているツールバー（＜・共有・更新）に入力欄が隠れるときだけ、ここを 70 くらいにする
+    // （ふつうは 0 のままでよい：見えている高さに合わせているので、ツールバーの上で止まる）
+    const IOS_TOOLBAR_SPACE = 120;
+
+    const chatLayoutEl = document.querySelector(".chat-layout");
+    const chatMainEl = document.querySelector(".chat-main");
+    const siteHeaderEl = document.querySelector("body.chat-screen > header, body.chat-screen .header");
+
+    function fitViewport() {
+        const h = vv ? vv.height : window.innerHeight;
+        const top = vv ? vv.offsetTop : 0;
+        root.style.setProperty("--app-h", h + "px");
+        root.style.setProperty("--app-top", top + "px");
+
+        // キーボードが出ている（見えている高さが大きく減った）ときは、ツールバー分の余白はいらない
+        fullHeight = Math.max(fullHeight, window.innerHeight);
+        const keyboard = h < fullHeight - 120;
+        root.classList.toggle("is-keyboard", keyboard);
+
+        // ★ chat.css が古いまま（スマホのキャッシュ）でも効くように、ここで直接指定する
+        const b = document.body.style;
+        const l = chatLayoutEl.style;
+        const m = chatMainEl.style;
+        if (phone.matches) {
+            // 画面（見えている部分）＝ ヘッダー ＋ チャット。チャットは残りの高さぴったり
+            b.position = "fixed";
+            b.left = "0";
+            b.right = "0";
+            b.top = top + "px";
+            b.height = h + "px";
+            b.display = "flex";
+            b.flexDirection = "column";
+            b.overflow = "hidden";
+
+            if (siteHeaderEl) siteHeaderEl.style.flexShrink = "0";
+            document.querySelectorAll("body.chat-screen .footer, body.chat-screen > footer")
+                .forEach(function (f) { f.style.display = "none"; });
+
+            l.display = "flex";
+            l.flexDirection = "column";
+            l.flex = "1 1 auto";
+            l.height = "auto";
+            l.minHeight = "0";
+            l.padding = "0";
+            l.gap = "0";
+
+            m.flex = "1 1 auto";
+            m.height = "auto";
+            m.minHeight = "0";
+
+            sendBar.style.flexShrink = "0";
+            sendBar.style.paddingBottom = (IOS_TOOLBAR_SPACE > 0 && isIOS && !keyboard)
+                    ? IOS_TOOLBAR_SPACE + "px" : "";
+        } else {
+            ["position", "left", "right", "top", "height", "display", "flexDirection", "overflow"]
+                .forEach(function (k) { b[k] = ""; });
+            ["display", "flexDirection", "flex", "height", "minHeight", "padding", "gap"]
+                .forEach(function (k) { l[k] = ""; });
+            ["flex", "height", "minHeight"].forEach(function (k) { m[k] = ""; });
+            sendBar.style.paddingBottom = "";
+        }
+
+        scrollBottom();
+    }
+    fitViewport();
+    window.addEventListener("load", fitViewport);
+    window.addEventListener("resize", fitViewport);
+    window.addEventListener("orientationchange", fitViewport);
+    if (vv) {
+        vv.addEventListener("resize", fitViewport);   // キーボードが出た・消えた
+        vv.addEventListener("scroll", fitViewport);
+    }
+    // 入力欄を押したとき、ページ全体がずれないようにする
+    input.addEventListener("focus", function () {
+        setTimeout(function () {
+            window.scrollTo(0, 0);
+            fitViewport();
+        }, 50);
+    });
 
     form.addEventListener("submit", function (e) {
         if (!input.value.trim()) {
@@ -531,6 +504,7 @@
     // AI パネルが無くなった分、チャット欄を右いっぱいまで広げる（chat.css が grid のとき）
     function fitLayout() {
         layout.style.gridTemplateColumns = "";
+        if (window.matchMedia("(max-width: 900px)").matches) return;   // スマホは CSS で縦並び
         const st = getComputedStyle(layout);
         if (st.display !== "grid") return;
         const cols = st.gridTemplateColumns.split(" ").filter(Boolean);
@@ -556,9 +530,31 @@
         panel.classList.contains("is-open") ? closeAi() : openAi();
     });
     document.getElementById("closeAiButton").addEventListener("click", closeAi);
-    backdrop.addEventListener("click", closeAi);
+
+    // ===== スマホ：☰ でチャット一覧を左から出す =====
+    const listPanel = document.getElementById("chatListPanel");
+    const listToggle = document.getElementById("chatListToggle");
+    function closeList() {
+        listPanel.classList.remove("is-open");
+        listToggle.setAttribute("aria-expanded", "false");
+        if (!panel.classList.contains("is-open")) backdrop.classList.remove("is-open");
+    }
+    listToggle.addEventListener("click", function () {
+        const open = !listPanel.classList.contains("is-open");
+        listPanel.classList.toggle("is-open", open);
+        backdrop.classList.toggle("is-open", open);
+        listToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    backdrop.addEventListener("click", function () {
+        closeAi();
+        closeList();
+    });
     document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") closeAi();
+        if (e.key === "Escape") {
+            closeAi();
+            closeList();
+        }
     });
 
     // Conversation list search
@@ -617,6 +613,10 @@
 })();
 </script>
 <% } %>
+
+<%-- 新着メッセージ通知：いま話している相手の通知は出さない --%>
+<script>window.CHAT_NOTIFY_IGNORE = "<%= partnerId > 0 ? String.valueOf(partnerId) : "" %>";</script>
+<%@ include file="/common/chat-notify.jsp" %>
 
 <%-- 共通フッター（</body></html> もここで閉じる） --%>
 <%@ include file="/common/footer.jsp" %>

@@ -38,6 +38,8 @@
     if (nextEvents == null) nextEvents = new ArrayList<>();
 
     boolean ended = "終了".equals(ev.getEventStatus());
+    // 「10分後に終了」を押したあと（カウントダウン中）なら終了予定時刻（例：14:35）
+    String scheduledEnd = (String) request.getAttribute("scheduledEnd");
     String selectedNext = request.getParameter("nextEvent");
     boolean checked = "on".equals(request.getParameter("confirmDelete"));
 
@@ -52,6 +54,68 @@
     <title>イベント終了 | Chat2Real</title>
     <link rel="stylesheet" href="<%= ctx %>/css/event-dashboard.css?v=1">
     <link rel="stylesheet" href="<%= ctx %>/css/event-end.css">
+    <style>
+        .end-timing {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 6px 0 20px;
+        }
+
+        .timing-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px 16px;
+
+            background: #ffffff;
+            border: 1px solid #dce5f1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .timing-option:has(input:checked) {
+            background: #fff5f9;
+            border-color: #f45b91;
+        }
+
+        .timing-option input {
+            margin-top: 4px;
+            accent-color: #f45b91;
+        }
+
+        .timing-option strong {
+            display: block;
+            color: #173b63;
+            font-size: 15px;
+        }
+
+        .timing-option small {
+            display: block;
+            margin-top: 2px;
+            color: #7184a0;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .end-countdown {
+            margin: 12px 0 22px;
+            padding: 16px 18px;
+
+            color: #7a3b00;
+            background: #fff7e6;
+            border: 1px solid #ffd59a;
+            border-radius: 12px;
+
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .end-countdown strong {
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
@@ -102,6 +166,28 @@
                     <button type="button" class="btn" onclick="location.href='<%= dashboardUrl %>'">イベント管理に戻る</button>
                 </div>
 
+<% } else if (scheduledEnd != null) { %>
+
+                <!-- 「10分後に終了」を押したあと -->
+                <h1 class="end-title"><%= h(scheduledEnd) %> にイベントを終了します</h1>
+                <div class="end-countdown" role="status">
+                    参加者に「まもなくイベント終了です（あと10分）」を配信しました。<br>
+                    <strong><%= h(scheduledEnd) %></strong> になると自動で終了し、「イベントは終了しました」を配信します。
+                    終了後、参加者のチャットなどの機能は使えなくなります。
+                </div>
+
+                <form action="<%= ctx %>/admin/EventEnd.action" method="post" id="endNowForm">
+                    <input type="hidden" name="eventId" value="<%= ev.getEventId() %>">
+                    <input type="hidden" name="endTiming" value="now">
+                    <input type="hidden" name="confirmDelete" value="on">
+
+                    <div class="end-buttons">
+                        <button type="button" class="btn"
+                                onclick="location.href='<%= dashboardUrl %>'">イベント管理に戻る</button>
+                        <button type="submit" class="btn btn-danger">今すぐ終了する</button>
+                    </div>
+                </form>
+
 <% } else { %>
 
                 <!-- 1. 確認メッセージ -->
@@ -150,6 +236,25 @@
                     </select>
                     <p class="end-hint">選ぶと、次回イベントの案内をお知らせとして参加者に配信します。</p>
 
+                    <!-- 終了のしかた（参加者へのお知らせ） -->
+                    <p class="end-subtitle">終了のしかた</p>
+                    <div class="end-timing">
+                        <label class="timing-option">
+                            <input type="radio" name="endTiming" value="10min" checked>
+                            <span>
+                                <strong>10分後に終了する（おすすめ）</strong>
+                                <small>参加者に「あと10分」をすぐ配信し、10分後に自動で終了して「終了しました」を配信します。</small>
+                            </span>
+                        </label>
+                        <label class="timing-option">
+                            <input type="radio" name="endTiming" value="now">
+                            <span>
+                                <strong>今すぐ終了する</strong>
+                                <small>すぐに終了して「終了しました」を配信します。参加者の機能はすぐ使えなくなります。</small>
+                            </span>
+                        </label>
+                    </div>
+
                     <!-- 5. 確認チェック -->
                     <label class="end-check">
                         <input type="checkbox" name="confirmDelete" id="confirmDelete"<%= checked ? " checked" : "" %>>
@@ -175,7 +280,17 @@
 
     </main>
 
-<% if (!ended) { %>
+<% if (!ended && scheduledEnd != null) { %>
+    <script>
+        document.getElementById("endNowForm").addEventListener("submit", function (e) {
+            if (!confirm("イベントを今すぐ終了します。よろしいですか？")) {
+                e.preventDefault();
+            }
+        });
+        // 終了予定時刻を過ぎたら画面を更新（終了済みの表示になる）
+        setTimeout(function () { location.reload(); }, 60000);
+    </script>
+<% } else if (!ended) { %>
     <script>
         // 確認チェックが ON のときだけ「イベントを終了する」を押せる
         const confirmBox = document.getElementById("confirmDelete");
@@ -187,7 +302,11 @@
 
         // 最後にもう一度確認する（元に戻せないため）
         document.getElementById("endForm").addEventListener("submit", function (e) {
-            if (!confirm("イベントを終了します。よろしいですか？")) {
+            const tenMin = document.querySelector("input[name='endTiming']:checked").value === "10min";
+            const msg = tenMin
+                ? "参加者に「あと10分」を配信し、10分後にイベントを終了します。よろしいですか？"
+                : "イベントを今すぐ終了します。よろしいですか？";
+            if (!confirm(msg)) {
                 e.preventDefault();
             }
         });

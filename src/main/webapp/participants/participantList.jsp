@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets" %>
 <%@ page import="Bean.ParticipantListBean, Bean.InterestBean" %>
+<%@ include file="/common/chat-notify.jsp" %>
 <%!
     private static String h(Object value) {
         if (value == null) {
@@ -88,6 +89,7 @@
             <% if (list.isCanChat()) { %>
             <a href="<%= ctx %>/chat" class="open-chat-button">
                 <span aria-hidden="true">💬</span> チャット画面へ
+                 <span class="cn-badge" id="chatUnreadBadge" hidden>0</span>
             </a>
         <% } else { %>
             <button type="button" class="open-chat-button" disabled>
@@ -232,6 +234,7 @@
                 <% if (list.isCanChat()) { %>
                     <a href="<%= h(chatBase) %>?partnerId=<%= p.getEventParticipantId() %>" class="chat-button">
                         チャットする
+                         <span class="cn-badge" data-unread-partner="<%= p.getEventParticipantId() %>" hidden>0</span>
                     </a>
                 <% } else { %>
                     <button type="button" class="chat-button" disabled>チャットする</button>

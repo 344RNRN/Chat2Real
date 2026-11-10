@@ -18,6 +18,7 @@ import Bean.ChatConversationBean;
 import Bean.ChatMessageBean;
 import Bean.ChatPartnerBean;
 import DAO.ChatDAO;
+import DAO.ChatUnreadDAO;
 import DAO.DBManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -70,6 +71,9 @@ public class ChatAction extends HttpServlet {
         if (c == null) {
             return;
         }
+
+        // このチャットを見ている ＝ 既読（参加者一覧の通知バッジから消える）
+        markRead(c);
 
         // 自動更新（3秒ごと）：メッセージ部分の HTML だけ返す
         if ("/chat/messages".equals(req.getServletPath())) {
@@ -142,6 +146,7 @@ public class ChatAction extends HttpServlet {
                 req.getSession().setAttribute("chatFlash", "メッセージは1〜" + MAX_LENGTH + "文字で入力してください");
             } else {
                 dao.insertMessage(c.chat.getChatId(), c.me.getParticipantId(), text);
+                markRead(c);
             }
             resp.sendRedirect(back);           // 再読み込みで二重送信されないよう redirect
         } catch (SQLException e) {
@@ -255,6 +260,15 @@ public class ChatAction extends HttpServlet {
         }
     }
 
+    /** そのチャットを既読にする（失敗しても画面は止めない。add_chat_unread.sql が未実行のときなど） */
+    private void markRead(Ctx c) {
+        try {
+            new ChatUnreadDAO().markRead(c.chat.getChatId(), c.me.getId());
+        } catch (SQLException e) {
+            System.out.println("[既読] 更新できませんでした：" + e.getMessage());
+        }
+    }
+
     /**
      * 左の「チャット一覧」：自分がチャットしたことのある相手 全員（新しいメッセージ順）
      * ※ 同じ相手と複数のチャットがあるときは新しい方だけ
@@ -263,11 +277,15 @@ public class ChatAction extends HttpServlet {
     private List<ChatConversationBean> findConversations(long myEventParticipantId) {
         String sql =
             "SELECT other.event_participant_id, c.chat_id, c.chat_status, " +
-            "       p.nickname, p.profile_image_url, lm.message_text, lm.sent_at " +
+            "       p.nickname, p.profile_image_url, lm.message_text, lm.sent_at, " +
+            "       (SELECT COUNT(*) FROM t011_messages u " +
+            "         WHERE u.chat_id = c.chat_id AND u.sender_participant_id <> me.participant_id " +
+            "           AND (mine.last_read_at IS NULL OR u.sent_at > mine.last_read_at)) AS unread " +
             "FROM t014_chat_participants mine " +
             "JOIN t014_chat_participants other " +
             "  ON other.chat_id = mine.chat_id AND other.event_participant_id <> mine.event_participant_id " +
             "JOIN t010_chats c ON c.chat_id = mine.chat_id AND c.chat_type = '個人' " +
+            "JOIN t006_events_participant me ON me.event_participant_id = mine.event_participant_id " +
             "JOIN t006_events_participant ep ON ep.event_participant_id = other.event_participant_id " +
             "LEFT JOIN t007_profiles p ON p.profile_id = ep.profile_id " +
             "LEFT JOIN LATERAL (SELECT message_text, sent_at FROM t011_messages m " +
@@ -293,6 +311,7 @@ public class ChatAction extends HttpServlet {
                     row.setNickname(rs.getString("nickname"));
                     row.setPhotoUrl(rs.getString("profile_image_url"));
                     row.setLastMessage(rs.getString("message_text"));
+                    row.setUnreadCount(rs.getInt("unread"));
                     java.sql.Timestamp at = rs.getTimestamp("sent_at");
                     row.setTimeText(at == null ? "" : shortTime(at.toLocalDateTime()));
                     byPartner.put(partnerId, row);

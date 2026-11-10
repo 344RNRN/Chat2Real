@@ -21,6 +21,7 @@ public class ChatEndDAO {
     public static final String STATUS_ENDED = "終了";
 
     /** ep（t006）がチャット c（t010）の当事者である条件 */
+    /** ep（t006）がチャット c（t010）の当事者である条件 */
     private static final String IS_PARTY =
               " (EXISTS (SELECT 1 FROM public.t012_exchange_requests r "
             + "          WHERE r.chat_id = c.chat_id "
@@ -28,15 +29,12 @@ public class ChatEndDAO {
             + "              OR r.target_event_participant_id = ep.event_participant_id)) "
             + "  OR EXISTS (SELECT 1 FROM public.t011_messages m "
             + "          WHERE m.chat_id = c.chat_id "
-<<<<<<< HEAD
             + "            AND m.sender_participant_id = ep.participant_id) "
             // 個人チャット画面（ChatAction）で作ったチャットのメンバー
             + "  OR EXISTS (SELECT 1 FROM public.t014_chat_participants cp "
             + "          WHERE cp.chat_id = c.chat_id "
             + "            AND cp.event_participant_id = ep.event_participant_id)) ";
-=======
-            + "            AND m.sender_participant_id = ep.participant_id)) ";
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
+
 
     /** 個人チャットの状態（利用中／終了）。個人チャットが無ければ null */
     public String findPersonalChatStatus(long chatId) throws SQLException {

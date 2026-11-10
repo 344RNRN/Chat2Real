@@ -14,6 +14,7 @@ public class ChatConversationBean implements Serializable {
     private String lastMessage;      // 最後のメッセージ（まだ無ければ null）
     private String timeText;         // 今日なら「14:12」、それ以外は「11/9」
     private boolean ended;           // チャットが「終了」
+    private int unreadCount;         // 未読（相手から来て、まだ見ていないメッセージ）
 
     public long getPartnerId() { return partnerId; }
     public void setPartnerId(long partnerId) { this.partnerId = partnerId; }
@@ -32,6 +33,9 @@ public class ChatConversationBean implements Serializable {
 
     public String getTimeText() { return timeText; }
     public void setTimeText(String timeText) { this.timeText = timeText; }
+
+    public int getUnreadCount() { return unreadCount; }
+    public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
 
     public boolean isEnded() { return ended; }
     public void setEnded(boolean ended) { this.ended = ended; }
