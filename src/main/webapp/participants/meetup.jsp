@@ -155,16 +155,35 @@
 </main>
 
 <script>
-    // 相手が合図を送ると表示が変わるように、15秒ごとに画面を更新する
-    // （エリアを選んでいる途中は更新しない）
-    const zoneSelect = document.getElementById("zone");
-    const firstZone = zoneSelect.value;
-
-    setInterval(function () {
-        if (zoneSelect.value === firstZone) {
-            location.reload();
+    // 相手が合図を送ると表示が変わるように、15秒ごとに「相手のエリア」と「会場マップ」だけ取り直す
+    // （画面全体の再読み込みはしない。エリアを選んでいる途中もそのまま）
+    (function () {
+        function swap(selector, doc) {
+            var now = document.querySelector(selector);
+            var next = doc.querySelector(selector);
+            if (now && next && now.innerHTML !== next.innerHTML) {
+                now.replaceWith(next);
+            }
         }
-    }, 15000);
+        setInterval(function () {
+            if (document.hidden) return;
+            fetch(location.href, { cache: "no-store", credentials: "same-origin" })
+                .then(function (r) {
+                    if (r.redirected && /EventClosed/.test(r.url)) {   // イベントが終わっていたら終了画面へ
+                        location.href = r.url;
+                        return null;
+                    }
+                    return r.ok ? r.text() : null;
+                })
+                .then(function (html) {
+                    if (!html) return;
+                    var doc = new DOMParser().parseFromString(html, "text/html");
+                    swap(".partner-card", doc);
+                    swap(".map-panel", doc);
+                })
+                .catch(function () {});
+        }, 15000);
+    })();
 </script>
 
 <%-- 共通フッター（</body></html> もここで閉じる） --%>

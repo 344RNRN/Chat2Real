@@ -12,7 +12,10 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * 参加者画面の「終了お知らせ」（common/event-alert.jsp）が30秒ごとに聞きにくる
- *   GET /participant/EventStatus.action → {"ended":false,"minutesLeft":8}
+ *   GET /participant/EventStatus.action?path=/Chat2Real/participant/Top.action
+ *     → {"ended":false,"minutesLeft":8,"stay":false}
+ *   stay：今の画面が「終了後も開ける画面」（アンケート・退出など）なら true → 終了画面へ移動しない
+ *         （判断は EventEndedFilter と同じ一覧を使う）
  */
 @WebServlet("/participant/EventStatus.action")
 public class EventStatusAction extends HttpServlet {
@@ -43,6 +46,15 @@ public class EventStatusAction extends HttpServlet {
                 // わからないときは「終了していない」として返す
             }
         }
-        response.getWriter().write("{\"ended\":" + ended + ",\"minutesLeft\":" + minutesLeft + "}");
+        // 今いる画面（ブラウザの URL）が、終了後も開ける画面か
+        String page = request.getParameter("path");
+        String ctx = request.getContextPath();
+        if (page != null && page.startsWith(ctx)) {
+            page = page.substring(ctx.length());
+        }
+        boolean stay = EventEndedFilter.isAllowedAfterEnd(page);
+
+        response.getWriter().write("{\"ended\":" + ended + ",\"minutesLeft\":" + minutesLeft
+                + ",\"stay\":" + stay + "}");
     }
 }

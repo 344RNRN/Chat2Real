@@ -41,6 +41,15 @@ public class EventEndedFilter implements Filter {
         "/participants/participantLogin.jsp",
     };
 
+    /** 終了後も開ける画面か（event-alert.jsp も EventStatus.action を通してこれで判断する） */
+    public static boolean isAllowedAfterEnd(String path) {
+        if (path == null) return false;
+        for (String ok : ALLOWED) {
+            if (path.equals(ok)) return true;
+        }
+        return false;
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -49,11 +58,9 @@ public class EventEndedFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         String path = req.getRequestURI().substring(req.getContextPath().length());
-        for (String ok : ALLOWED) {
-            if (path.equals(ok)) {
-                chain.doFilter(request, response);
-                return;
-            }
+        if (isAllowedAfterEnd(path)) {
+            chain.doFilter(request, response);
+            return;
         }
 
         long myId = 0L;

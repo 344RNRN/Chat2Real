@@ -410,7 +410,7 @@
 
     // iPhone の下に浮いているツールバー（＜・共有・更新）に入力欄が隠れるときだけ、ここを 70 くらいにする
     // （ふつうは 0 のままでよい：見えている高さに合わせているので、ツールバーの上で止まる）
-    const IOS_TOOLBAR_SPACE = 0;
+    const IOS_TOOLBAR_SPACE = 200;
 
     const chatLayoutEl = document.querySelector(".chat-layout");
     const chatMainEl = document.querySelector(".chat-main");
