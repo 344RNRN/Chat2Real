@@ -1,10 +1,14 @@
 <%@ page pageEncoding="UTF-8" %>
 <%--
-  参加者画面の「イベント終了」お知らせ（30秒ごとに EventStatus.action に聞く）
+  参加者画面の「イベント終了」お知らせ（15秒ごとに EventStatus.action に聞く）
     ・終了10分前から：画面の上に「まもなくイベント終了（あと○分）」を出す
-    ・終了したら：「イベントは終了しました」画面へ自動で移動する
-  使い方：参加者の画面の footer.jsp の include のすぐ上に
-          <%@ include file="/common/event-alert.jsp" %>
+    ・終了したら：「イベントが終了しました・アンケートのお願い」を出して、
+                  3秒後に「イベントは終了しました」画面（アンケート案内つき）へ自動で移動する
+  使い方：common/header-participants.jsp のいちばん下で include しているので、
+          参加者のどの画面でも自動で動く（各 JSP に書かなくてよい）
+  ※ 終了画面・アンケート・退出・ログイン系の画面では、移動しない
+     （どの画面が該当するかは EventEndedFilter の一覧で決まる：サーバーが "stay" で返す）
+  ※ 同じ画面に2回 include されても1回しか動かない
   ※ ほかの JSP と名前がぶつからないよう、変数・クラス名は ea で始めている
 --%>
 <style>
@@ -41,6 +45,16 @@
         transform: translate(-50%, 0);
     }
 
+    /* 終了したとき（青＝お知らせ） */
+    .ea-toast.is-ended {
+        color: #173b63;
+        background: #eef4ff;
+        border-color: #bcd2f7;
+    }
+    .ea-toast.is-ended button {
+        color: #173b63;
+    }
+
     .ea-toast .ea-icon {
         font-size: 18px;
     }
@@ -65,25 +79,47 @@
 
 <script>
 (function () {
-    var STATUS_URL = "<%= request.getContextPath() %>/participant/EventStatus.action";
-    var CLOSED_URL = "<%= request.getContextPath() %>/participant/EventClosed.action";
+    if (window.__eaStarted) return;          // 2回 include されても1回だけ
+    window.__eaStarted = true;
+
+    var CTX = "<%= request.getContextPath() %>";
+    var STATUS_URL = CTX + "/participant/EventStatus.action?path=" + encodeURIComponent(location.pathname);
+    var CLOSED_URL = CTX + "/participant/EventClosed.action";
 
     var toast = document.getElementById("eaToast");
+    var icon = toast.querySelector(".ea-icon");
     var text = document.getElementById("eaText");
     var closedByUser = false;
+    var ended = false;
 
     document.getElementById("eaClose").addEventListener("click", function () {
         closedByUser = true;
         toast.classList.remove("is-show");
     });
 
+    function onEnded() {
+        if (ended) return;
+        ended = true;
+        icon.textContent = "🎉";
+        text.textContent = "イベントが終了しました。終了アンケートにご協力ください";
+        toast.classList.add("is-ended", "is-show");
+        setTimeout(function () { location.href = CLOSED_URL; }, 3000);   // 3秒後に終了画面へ
+    }
+
     function check() {
+        if (ended) return;
         fetch(STATUS_URL, { cache: "no-store", credentials: "same-origin" })
             .then(function (res) { return res.ok ? res.json() : null; })
             .then(function (s) {
                 if (!s) return;
                 if (s.ended) {
-                    location.href = CLOSED_URL;          // 終了 → 終了画面へ
+                    // アンケート・退出・終了画面など、終了後も使う画面ではそのまま（確認もやめる）
+                    // ※ サーバーが古くて "stay" が無いときは、URL で判断する（終了画面のくり返し読み込みを防ぐ）
+                    var stay = (typeof s.stay === "boolean")
+                            ? s.stay
+                            : /EventClosed|eventClosed|EventReport|eventReport|SurveyAnswer|SurveyComplete|surveyComplete|Leave|Login|Register/.test(location.pathname);
+                    if (stay || /EventClosed|eventClosed/.test(location.pathname)) { ended = true; return; }
+                    onEnded();
                     return;
                 }
                 if (s.minutesLeft >= 0 && s.minutesLeft <= 10) {
@@ -95,6 +131,9 @@
     }
 
     check();
-    setInterval(check, 30000);
+    setInterval(function () { if (!document.hidden) check(); }, 15000);
+    // スマホでほかのアプリから戻ってきたときも、すぐ確認する
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) check(); });
+    window.addEventListener("pageshow", function (e) { if (e.persisted) check(); });
 })();
 </script>
