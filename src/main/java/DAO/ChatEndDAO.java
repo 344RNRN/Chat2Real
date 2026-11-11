@@ -90,20 +90,55 @@ public class ChatEndDAO {
         }
     }
 
-    /** チャットを「終了」にする（すでに終了していれば何もしない） */
-    public void endChat(long chatId) throws SQLException {
-        String sql = "UPDATE public.t010_chats SET chat_status = ? "
-                   + "WHERE chat_id = ? AND chat_type = ? AND chat_status <> ?";
+    /** チャットを終了する（終了操作をした人も保存する） */
+    public void endChat(long chatId, long myEventParticipantId)
+            throws SQLException {
+    	
+    	
+        String sql =
+                "UPDATE public.t010_chats "
+              + "SET chat_status = ?, "
+              + "    ended_by_event_participant_id = ? "
+              + "WHERE chat_id = ? "
+              + "  AND chat_type = ? "
+              + "  AND chat_status <> ?";
+
+        try (Connection con = DBManager.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+        	
+
+            ps.setString(1, STATUS_ENDED);
+            ps.setLong(2, myEventParticipantId);
+            ps.setLong(3, chatId);
+            ps.setString(4, TYPE_PERSONAL);
+            ps.setString(5, STATUS_ENDED);
+
+            int result = ps.executeUpdate();
+
+            System.out.println("終了処理の更新件数 = " + result);
+        }
+    }
+    /** チャットを終了したイベント参加者IDを取得 */
+    public long findEndedByParticipantId(long chatId)
+            throws SQLException {
+
+        String sql =
+                "SELECT ended_by_event_participant_id "
+              + "FROM public.t010_chats "
+              + "WHERE chat_id = ?";
 
         try (Connection con = DBManager.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, STATUS_ENDED);
-            ps.setLong(2, chatId);
-            ps.setString(3, TYPE_PERSONAL);
-            ps.setString(4, STATUS_ENDED);
+            ps.setLong(1, chatId);
 
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong("ended_by_event_participant_id");
+                }
+            }
         }
+
+        return 0;
     }
 }

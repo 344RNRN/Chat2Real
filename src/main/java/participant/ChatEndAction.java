@@ -45,6 +45,13 @@ public class ChatEndAction extends HttpServlet {
             if (status != null && dao.isMember(chatId, myId)) {
                 request.setAttribute("chatEnded",
                         ChatEndDAO.STATUS_ENDED.equals(status));
+                // チャットを終了した人のIDを取得
+                long endedById = dao.findEndedByParticipantId(chatId);
+
+                // 自分が終了したのか、相手が終了したのか判定
+                boolean endedByMe = endedById != 0 && endedById == myId;
+
+                request.setAttribute("endedByMe", endedByMe);
 
                 ProfileBean partner =
                         MeetupAction.findPartnerProfile(dao.findPartnerId(chatId, myId));
@@ -72,19 +79,37 @@ public class ChatEndAction extends HttpServlet {
         long chatId = MeetupAction.toLong(request.getParameter("chatId"));
         long myId = MeetupAction.getMyEventParticipantId(request);
 
+
         ChatEndDAO dao = new ChatEndDAO();
 
         try {
+            String status = dao.findPersonalChatStatus(chatId);
+
+            System.out.println("chatStatus = " + status);
+
             if (chatId > 0
-                    && dao.findPersonalChatStatus(chatId) != null
+                    && status != null
+                    && !ChatEndDAO.STATUS_ENDED.equals(status)
                     && dao.isMember(chatId, myId)) {
-                dao.endChat(chatId);
+
+                dao.endChat(chatId, myId);
+                System.out.println("終了処理後の確認");
+
+                long endedById = dao.findEndedByParticipantId(chatId);
+
+                System.out.println("DBに保存された終了者ID = " + endedById);
+
+                System.out.println("チャット終了処理を実行しました。");
+
+            } else {
+                System.out.println("チャット終了処理を実行できませんでした。");
+                System.out.println("member = " + dao.isMember(chatId, myId));
             }
+
         } catch (SQLException e) {
             throw new ServletException("チャットを終了できませんでした。", e);
         }
 
-        // 再読み込みで二重送信しないように GET で表示する
         response.sendRedirect(request.getContextPath()
                 + "/participant/ChatEnd.action?chatId=" + chatId);
     }

@@ -246,11 +246,16 @@
                     <button type="submit" class="req">申請</button>
                 </form>
 
-                <form method="post" action="<%= ctx %>/chat/end"
-                      onsubmit="return confirm('チャットを終了しますか？');">
-                    <input type="hidden" name="partnerId" value="<%= partnerId %>">
-                    <button type="submit" class="end">終了</button>
-                </form>
+                <form method="post"
+      				action="<%= ctx %>/participant/ChatEnd.action"
+      				onsubmit="return confirm('チャットを終了しますか？');">
+
+    					<input type="hidden"
+           					name="chatId"
+           					value="<%= chatId == null ? 0 : chatId %>">
+
+    					<button type="submit" class="end">終了</button>
+				</form>
             </div>
         </header>
 
@@ -410,7 +415,7 @@
 
     // iPhone の下に浮いているツールバー（＜・共有・更新）に入力欄が隠れるときだけ、ここを 70 くらいにする
     // （ふつうは 0 のままでよい：見えている高さに合わせているので、ツールバーの上で止まる）
-    const IOS_TOOLBAR_SPACE = 0;
+    const IOS_TOOLBAR_SPACE = 120;
 
     const chatLayoutEl = document.querySelector(".chat-layout");
     const chatMainEl = document.querySelector(".chat-main");

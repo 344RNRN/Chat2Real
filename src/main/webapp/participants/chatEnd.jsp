@@ -21,7 +21,8 @@
 %>
 <%
     // ===== サーブレット（ChatEndAction）から受け取るデータ =====
-    Boolean chatEnded = (Boolean) request.getAttribute("chatEnded");     // null：自分のチャットではない
+    Boolean chatEnded = (Boolean) request.getAttribute("chatEnded");
+	Boolean endedByMe = (Boolean) request.getAttribute("endedByMe");// true：自分が終了、false：相手が終了
     String partnerName = (String) request.getAttribute("partnerName");   // 相手のニックネーム
     String partnerPhoto = (String) request.getAttribute("partnerPhoto"); // 相手の写真（無いときは null）
 
@@ -64,7 +65,7 @@
 <% if (partnerPhoto != null) { %>
                 <img src="<%= h(partnerPhoto) %>" alt="<%= h(partnerName) %>さんの写真">
 <% } else { %>
-                <%= h(partnerName.substring(0, 1)) %>
+                <%= h(partnerName.isEmpty() ? "?" : partnerName.substring(0, 1)) %>
 <% } %>
             </span>
             <span class="person-name"><%= h(partnerName) %></span>
@@ -78,10 +79,25 @@
         <h2 class="message-title">チャットを終了しました</h2>
 
         <!-- 3. 説明文 -->
-        <p class="message-text">
-            お相手にも終了したことが伝わります。<br>
-            ありがとうございました。
-        </p>
+        <% if (Boolean.TRUE.equals(endedByMe)) { %>
+
+    		<!-- 自分が終了ボタンを押した場合 -->
+    		<p class="message-text">
+        		あなたがチャットを終了しました。<br>
+        		お相手にも終了したことが伝わります。<br>
+        		ありがとうございました。
+    		</p>
+
+		<% } else { %>
+
+    		<!-- 相手が終了ボタンを押した場合 -->
+    		<p class="message-text">
+        		お相手がチャットを終了しました。<br>
+        		このチャットは終了しています。<br>	
+        		ありがとうございました。
+		 	</p>
+
+<% } %>
 <% } else { %>
         <h2 class="message-title">このチャットはまだ終了していません</h2>
         <p class="message-text">個人チャット画面の「終了」ボタンから終了できます。</p>
