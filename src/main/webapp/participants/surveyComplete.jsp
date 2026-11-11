@@ -31,7 +31,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>送信完了 | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/participant-message.css">
+    <link rel="stylesheet" href="<%= ctx %>/css/participant-message.css?v=3"">
 </head>
 <body>
 

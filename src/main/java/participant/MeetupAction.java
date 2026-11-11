@@ -8,6 +8,7 @@ import Bean.ExchangeRequestBean;
 import Bean.ProfileBean;
 import DAO.EventParticipantDAO;
 import DAO.ExchangeRequestDAO;
+import DAO.MeetupZoneDAO;
 import DAO.ProfileDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -65,12 +66,17 @@ public class MeetupAction extends HttpServlet {
                 request.setAttribute("myZone", participantDao.findCurrentZone(myId));
                 request.setAttribute("exchangeRequestId", exchangeRequestId);
 
+                // 6. 運営者が入れた合流エリア・会場マップ（お知らせ配信画面で設定）
+                Object[] venue = new MeetupZoneDAO().findByEventParticipantId(myId);
+                request.setAttribute("zones", venue[0]);
+                request.setAttribute("venueMapPath", venue[1]);
+
             } catch (SQLException e) {
                 throw new ServletException("合流情報の取得に失敗しました。", e);
             }
         }
 
-        // 6. 画面へ（相手がいないときは「合流する相手の情報がありません。」）
+        // 7. 画面へ（相手がいないときは「合流する相手の情報がありません。」）
         request.getRequestDispatcher("/participants/meetup.jsp")
                .forward(request, response);
     }

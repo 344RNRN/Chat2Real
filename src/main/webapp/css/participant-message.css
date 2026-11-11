@@ -7,27 +7,35 @@
    ======================================== */
 
 :root {
-    --primary-color: #ed7628;
-    --primary-hover: #d9651c;
+    /* ログイン画面（admin-login.css）・イベントルーム（top.css）と同じ色 */
+    --primary-color: #f45b91;      /* ピンク（メインのボタン・自分） */
+    --primary-hover: #e2477e;
+    --primary-soft: #fff0f6;
+    --primary-line: #ffd0e1;
 
-    --blue-color: #4a7fd6;
+    --blue-color: #3b82f6;
+    --blue-soft: #eef4ff;
+
+    --navy-color: #173b63;
 
     --pink-color: #f582ad;
     --pink-dark: #ed477a;
 
     --green-color: #2fa58c;
 
-    --text-primary: #292929;
-    --text-secondary: #737373;
+    --text-primary: #233b59;
+    --text-secondary: #7184a0;
 
-    --border-color: #e7e4e1;
-    --background-color: #f8f7f5;
+    --border-color: #dce5f1;
+    --background-color: #f5f8ff;
     --surface-color: #ffffff;
 
-    --radius-medium: 10px;
-    --radius-large: 14px;
+    --radius-small: 10px;
+    --radius-medium: 12px;
+    --radius-large: 22px;
 
-    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+    --shadow-card: 0 18px 50px rgba(40, 66, 105, 0.08);
+    --pink-gradient: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
 }
 
 
@@ -336,4 +344,233 @@
     .message-card {
         padding: 24px 16px;
     }
+}
+
+
+/* ========================================
+   ログイン画面と同じ背景・ボタン（デザイン統一）
+   ======================================== */
+
+body:has(.message-page) {
+    color: var(--text-primary);
+    background:
+        radial-gradient(circle at 6% 18%, rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%, rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%, rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+.message-page .page-eyebrow {
+    padding: 5px 13px;
+    color: var(--primary-color);
+    background: var(--primary-soft);
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.message-page h1,
+.message-page .page-title {
+    color: var(--navy-color);
+    font-weight: 800;
+}
+
+.message-page .back-link:hover,
+.message-page .sub-link:hover {
+    color: var(--primary-color);
+}
+
+/* アイコン：自分＝青、相手＝ピンク */
+.avatar {
+    background: var(--blue-color);
+}
+
+.avatar.me {
+    background: var(--blue-color);
+}
+
+.avatar.partner {
+    background: var(--pink-gradient);
+}
+
+.avatar.large {
+    width: 72px;
+    height: 72px;
+    font-size: 26px;
+    box-shadow: 0 6px 16px rgba(40, 66, 105, 0.12);
+}
+
+.status-icon.match {
+    color: var(--primary-color);
+    background: var(--primary-soft);
+}
+
+.message-title {
+    color: var(--navy-color);
+    font-weight: 800;
+}
+
+.note {
+    color: #6b5b2b;
+}
+
+/* メインのボタン＝ピンクのグラデーション */
+.main-button {
+    height: 50px;
+    background: var(--pink-gradient);
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
+}
+
+.main-button:hover {
+    background: var(--pink-gradient);
+    filter: brightness(1.03);
+}
+
+/* ========================================
+   交流申請画面（interaction.jsp）
+   ======================================== */
+
+/* サブのボタン（今はやめておく・申請を取り消す） */
+.outline-button {
+    width: 100%;
+    height: 46px;
+
+    color: var(--text-secondary);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.outline-button:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-line);
+}
+
+/* 直接交流する ＋ 今はやめておく */
+.button-row {
+    display: grid;
+    gap: 10px;
+}
+
+/* 状態のバッジ */
+.state-badge {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 5px 14px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.state-badge.incoming {
+    color: var(--primary-color);
+    background: var(--primary-soft);
+}
+
+.state-badge.waiting {
+    color: var(--blue-color);
+    background: var(--blue-soft);
+}
+
+/* 返事待ちの「…」 */
+.waiting-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 20px;
+}
+
+.waiting-dots span {
+    width: 10px;
+    height: 10px;
+    background: var(--primary-line);
+    border-radius: 50%;
+    animation: waiting-dot 1.2s infinite ease-in-out;
+}
+
+.waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+.waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes waiting-dot {
+    0%, 80%, 100% { transform: scale(0.7); background: var(--primary-line); }
+    40%           { transform: scale(1.1); background: var(--primary-color); }
+}
+
+/* 送った・取り消した などのお知らせ */
+.flash-message {
+    margin: 0 0 14px;
+    padding: 12px 16px;
+
+    color: #1f7a4d;
+    background: #eefaf3;
+    border: 1px solid #c9ecd8;
+    border-radius: var(--radius-medium);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .waiting-dots span { animation: none; }
+}
+
+/* ========================================
+   申請が見送られたときのやさしいお知らせ
+   ======================================== */
+
+/* <a> でもボタンと同じ見た目にする */
+a.main-button,
+a.outline-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+.state-badge.soft {
+    color: #3f7d5a;
+    background: #eaf6ee;
+}
+
+.note.soft-note {
+    color: #3f6650;
+    background: #f1f9f3;
+    border-color: #cfe8d7;
+    text-align: center;
+}
+
+.again-form {
+    margin-top: 14px !important;
+    text-align: center;
+}
+
+/* 「もう一度申請する」は目立たせない */
+.text-button {
+    padding: 6px 4px;
+
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+
+    font-family: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    cursor: pointer;
+}
+
+.text-button:hover {
+    color: var(--primary-color);
 }

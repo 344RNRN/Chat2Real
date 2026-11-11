@@ -4,26 +4,35 @@
    ======================================== */
 
 :root {
-    --primary-color: #ed7628;
-    --primary-hover: #d9651c;
+    /* ログイン画面（admin-login.css）・イベントルーム（top.css）と同じ色 */
+    --primary-color: #f45b91;      /* ピンク（メインのボタン・自分） */
+    --primary-hover: #e2477e;
+    --primary-soft: #fff0f6;
+    --primary-line: #ffd0e1;
 
-    --blue-color: #4a7fd6;
+    --blue-color: #3b82f6;
+    --blue-soft: #eef4ff;
+
+    --navy-color: #173b63;
 
     --pink-color: #f582ad;
     --pink-dark: #ed477a;
 
-    --text-primary: #292929;
-    --text-secondary: #737373;
+    --green-color: #2fa58c;
 
-    --border-color: #e7e4e1;
-    --background-color: #f8f7f5;
+    --text-primary: #233b59;
+    --text-secondary: #7184a0;
+
+    --border-color: #dce5f1;
+    --background-color: #f5f8ff;
     --surface-color: #ffffff;
 
-    --radius-small: 6px;
-    --radius-medium: 10px;
-    --radius-large: 14px;
+    --radius-small: 10px;
+    --radius-medium: 12px;
+    --radius-large: 22px;
 
-    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.035);
+    --shadow-card: 0 18px 50px rgba(40, 66, 105, 0.08);
+    --pink-gradient: linear-gradient(120deg, #ff7eaa 0%, #f44780 100%);
 }
 
 
@@ -403,4 +412,136 @@
     .map-panel {
         padding: 16px;
     }
+}
+
+
+/* ========================================
+   ログイン画面と同じ背景・ボタン（デザイン統一）
+   ======================================== */
+
+body:has(.meetup-page) {
+    color: var(--text-primary);
+    background:
+        radial-gradient(circle at 6% 18%, rgba(211, 199, 245, 0.24) 0 82px, transparent 83px),
+        radial-gradient(circle at 96% 20%, rgba(255, 207, 225, 0.24) 0 125px, transparent 126px),
+        radial-gradient(circle at 88% 92%, rgba(214, 231, 255, 0.24) 0 150px, transparent 151px),
+        linear-gradient(120deg, #f5f8ff 0%, #ffffff 48%, #fff5f9 100%);
+    background-attachment: fixed;
+}
+
+.meetup-page .page-eyebrow {
+    padding: 5px 13px;
+    color: var(--primary-color);
+    background: var(--primary-soft);
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.meetup-page h1,
+.meetup-page .page-title {
+    color: var(--navy-color);
+    font-weight: 800;
+}
+
+.meetup-page .back-link:hover,
+.meetup-page .sub-link:hover {
+    color: var(--primary-color);
+}
+
+/* 相手のカード：左の線・写真 */
+.partner-card {
+    border-left: 5px solid var(--primary-color);
+}
+
+.partner-photo {
+    background: var(--pink-gradient);
+    border-radius: 50%;
+}
+
+/* 合図を送る＝ピンクのグラデーション */
+.signal-button {
+    background: var(--pink-gradient);
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(244, 91, 145, 0.22);
+}
+
+.signal-button:hover {
+    background: var(--pink-gradient);
+    filter: brightness(1.03);
+}
+
+.signal-sent {
+    color: var(--primary-hover);
+}
+
+/* 会場マップ：相手＝ピンク、自分＝青 */
+.map-zone {
+    background: #ffffff;
+    border-color: var(--border-color);
+}
+
+.map-zone.has-me {
+    border: 1px solid var(--blue-color);
+    background: var(--blue-soft);
+}
+
+.map-zone.has-partner.has-me {
+    background: linear-gradient(135deg, #fff0f6, #eef4ff);
+}
+
+.map-pin.me {
+    background: var(--blue-color);
+}
+
+.zone-select:focus {
+    border-color: #8db5f0;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+}
+
+/* 交流結果を登録する＝紺の枠 */
+.result-button {
+    color: var(--navy-color);
+    border-color: var(--navy-color);
+}
+
+.result-button:hover {
+    background: var(--navy-color);
+}
+
+/* ===== 運営者が入れた会場マップの写真 ===== */
+.venue-photo {
+    position: relative;
+    display: block;
+    margin-bottom: 12px;
+    overflow: hidden;
+
+    background: #f6f8fb;
+    border: 1px solid var(--border-color, #e3e9f2);
+    border-radius: 14px;
+}
+
+.venue-photo img {
+    display: block;
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+}
+
+.venue-photo-zoom {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 4px 10px;
+
+    color: #ffffff;
+    background: rgba(23, 59, 99, 0.72);
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* エリア名が長くても はみ出さない */
+.map-zone-name {
+    overflow-wrap: anywhere;
 }

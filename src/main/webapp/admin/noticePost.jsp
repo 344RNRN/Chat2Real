@@ -52,6 +52,21 @@
         ngMessage = "添付ファイルは10MB以内にしてください。";
     }
 
+    // ===== 会場マップ・合流エリア =====
+    @SuppressWarnings("unchecked")
+    List<String> meetupZones = (List<String>) request.getAttribute("meetupZones");
+    String venueMapPath = (String) request.getAttribute("venueMapPath");
+    String zonesText = (meetupZones == null) ? "" : String.join("\n", meetupZones);
+
+    String venueOk = "1".equals(request.getParameter("venueSaved"))
+            ? "会場マップ・合流エリアを保存しました。参加者の合流画面に反映されます。" : null;
+    String venueNg = null;
+    if ("type".equals(request.getParameter("venueError"))) {
+        venueNg = "会場マップは画像（JPG・PNG など）を選んでください。";
+    } else if ("size".equals(request.getParameter("venueError"))) {
+        venueNg = "会場マップは10MB以内にしてください。";
+    }
+
     SimpleDateFormat timeFormat = new SimpleDateFormat("M/d HH:mm");
 %>
 <!DOCTYPE html>
@@ -63,7 +78,7 @@
     <title>お知らせ配信 | Chat2Real</title>
 
     <link rel="stylesheet" href="<%= ctx %>/css/admin-login.css">
-    <link rel="stylesheet" href="<%= ctx %>/css/notice-post.css">
+    <link rel="stylesheet" href="<%= ctx %>/css/notice-post.css?v=3">
 </head>
 
 <body>
@@ -252,7 +267,83 @@
             </section>
 
         </div>
+
+        <!-- 会場マップ・合流エリア（参加者の「合流」画面に出る） -->
+        <section class="venue-settings" id="venue">
+            <div class="venue-head">
+                <h3>会場マップ・合流エリア</h3>
+                <p>相互承認した参加者が、合流するときに使います。会場に合わせて変えてください。</p>
+            </div>
+
+            <% if (venueOk != null) { %>
+            <p class="notice-message ok" role="status"><%= venueOk %></p>
+            <% } else if (venueNg != null) { %>
+            <p class="notice-message ng" role="alert"><%= venueNg %></p>
+            <% } %>
+
+            <form action="<%= ctx %>/admin/MeetupZone.action" method="post"
+                  enctype="multipart/form-data" class="venue-form">
+                <input type="hidden" name="eventId" value="<%= eventId %>">
+
+                <div class="venue-grid">
+
+                    <!-- 会場マップの写真 -->
+                    <div class="venue-map-box">
+                        <span class="form-label">会場マップ（写真）</span>
+                        <div class="venue-preview" id="venuePreview">
+                        <% if (venueMapPath != null) { %>
+                            <img src="<%= ctx %><%= escapeHtml(venueMapPath) %>" alt="会場マップ">
+                        <% } else { %>
+                            <span class="venue-empty">まだ写真がありません<br>会場の見取り図や写真を入れてください</span>
+                        <% } %>
+                        </div>
+                        <input type="file" id="venueMap" name="venueMap" accept="image/*">
+                        <span class="file-note">画像（10MB まで）</span>
+                        <% if (venueMapPath != null) { %>
+                        <label class="venue-remove">
+                            <input type="checkbox" name="removeMap"> 今の写真を消す
+                        </label>
+                        <% } %>
+                    </div>
+
+                    <!-- 合流エリア -->
+                    <div class="venue-zone-box">
+                        <label for="zones" class="form-label">合流エリア（1行に1つ・12個まで）</label>
+                        <textarea id="zones" name="zones" rows="7"
+                                  placeholder="入口付近&#10;ステージ前&#10;中央テーブル&#10;ドリンクコーナー"><%= escapeHtml(zonesText) %></textarea>
+                        <span class="file-note">空にすると「入口付近・ステージ前・中央テーブル・ドリンクコーナー」になります。1つ30文字まで。</span>
+
+                        <label class="venue-notify">
+                            <input type="checkbox" name="notify" checked>
+                            参加者にお知らせとして配信する（写真も添付）
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="send-button">保存する</button>
+                </div>
+            </form>
+        </section>
     </main>
+
+    <!-- 会場マップ：選んだ写真をその場で表示 -->
+    <script>
+        (function () {
+            var input = document.getElementById("venueMap");
+            var box = document.getElementById("venuePreview");
+            if (!input || !box) return;
+            input.addEventListener("change", function () {
+                var f = input.files && input.files[0];
+                if (!f || f.type.indexOf("image/") !== 0) return;
+                var img = document.createElement("img");
+                img.alt = "会場マップ";
+                img.src = URL.createObjectURL(f);
+                box.innerHTML = "";
+                box.appendChild(img);
+            });
+        })();
+    </script>
 
     <!-- テンプレートを選んだら、タイトル（と本文のひな形）を自動入力 -->
     <script>

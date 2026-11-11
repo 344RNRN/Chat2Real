@@ -7,6 +7,7 @@ import java.util.List;
 import Bean.ExchangeRequestBean;
 import DAO.EventParticipantDAO;
 import DAO.ExchangeRequestDAO;
+import DAO.MeetupZoneDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,10 +22,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MeetupSignalAction extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
-    // 選べるエリア（meetup.jsp の選択肢と同じ）
-    private static final List<String> ZONES =
-            List.of("入口付近", "ステージ前", "中央テーブル", "ドリンクコーナー");
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -46,10 +43,14 @@ public class MeetupSignalAction extends HttpServlet {
 
         boolean isMember = MeetupAction.getPartnerId(exchange, myId) > 0;
 
-        // 4つのエリア以外は保存しない
-        if (isMember && ZONES.contains(zone)) {
+        // 運営者が設定したエリア以外は保存しない
+        if (isMember && zone != null) {
             try {
-                new EventParticipantDAO().updateCurrentZone(myId, zone);
+                @SuppressWarnings("unchecked")
+                List<String> zones = (List<String>) new MeetupZoneDAO().findByEventParticipantId(myId)[0];
+                if (zones.contains(zone)) {
+                    new EventParticipantDAO().updateCurrentZone(myId, zone);
+                }
             } catch (SQLException e) {
                 throw new ServletException("合図の送信に失敗しました。", e);
             }

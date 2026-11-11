@@ -21,6 +21,27 @@
         return sb.toString();
     }
 
+    /** JavaScript の文字列（"…"）として安全に出す */
+    private static String js(Object value) {
+        if (value == null) {
+            return "\"\"";
+        }
+        StringBuilder sb = new StringBuilder("\"");
+        for (char c : value.toString().toCharArray()) {
+            switch (c) {
+                case '"':  sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': sb.append("\\n");  break;
+                case '\r': break;
+                case '<':  sb.append("\\u003c"); break;
+                case '>':  sb.append("\\u003e"); break;
+                case '&':  sb.append("\\u0026"); break;
+                default:   sb.append(c);
+            }
+        }
+        return sb.append('"').toString();
+    }
+
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
@@ -58,7 +79,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <title>チャット | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=8">
+    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=11">
 </head>
 <body class="chat-screen">
 
@@ -233,6 +254,13 @@
             </div>
         </header>
 
+        <!-- 交流申請のお知らせ（相手から届いた・相互承認が成立した） -->
+        <a class="request-banner" id="requestBanner" href="<%= ctx %>/interaction/request?partnerId=<%= partnerId %>" hidden>
+            <span class="request-banner-icon" aria-hidden="true">💌</span>
+            <span class="request-banner-text" id="requestBannerText"></span>
+            <span class="request-banner-go">確認する ›</span>
+        </a>
+
 
         <section class="chat-body" id="messages">
 
@@ -311,36 +339,16 @@
         <!-- CONVERSATION SUMMARY -->
         <section class="ai-summary">
             <h3>☏ 会話の要点（AIが理解した内容）</h3>
-            <ul>
+            <ul id="aiSummary">
                 <li>イベントで知り合った</li>
-                <li>共通の趣味について会話中</li>
-                <li>お互いの興味を共有している</li>
             </ul>
         </section>
 
         <!-- AI SUGGESTIONS -->
         <section class="ai-suggestions">
             <h3>✦ おすすめの返信（3つ）</h3>
-
-            <div class="suggestion-card">
-                <p>最近おすすめのアニメはありますか？</p>
-                <button type="button" class="copy-suggestion">
-                    ▢ コピー
-                </button>
-            </div>
-
-            <div class="suggestion-card">
-                <p>他にも好きな趣味はありますか？</p>
-                <button type="button" class="copy-suggestion">
-                    ▢ コピー
-                </button>
-            </div>
-
-            <div class="suggestion-card">
-                <p>このイベントに参加したきっかけは何ですか？</p>
-                <button type="button" class="copy-suggestion">
-                    ▢ コピー
-                </button>
+            <div id="aiSuggestionList">
+                <%-- 下の JavaScript が会話の内容から作る --%>
             </div>
         </section>
 
@@ -402,7 +410,7 @@
 
     // iPhone の下に浮いているツールバー（＜・共有・更新）に入力欄が隠れるときだけ、ここを 70 くらいにする
     // （ふつうは 0 のままでよい：見えている高さに合わせているので、ツールバーの上で止まる）
-    const IOS_TOOLBAR_SPACE = 120;
+    const IOS_TOOLBAR_SPACE = 0;
 
     const chatLayoutEl = document.querySelector(".chat-layout");
     const chatMainEl = document.querySelector(".chat-main");
@@ -486,15 +494,337 @@
         }
     });
 
-    // Gemini suggestion copy: copy into message input, not send automatically.
-    document.querySelectorAll(".copy-suggestion").forEach(function (button) {
-        button.addEventListener("click", function () {
-            const text = button.parentElement.querySelector("p").textContent.trim();
-            input.value = text;
-            closeAi();
-            input.focus();
+    // =====================================================================
+    // AI チャットヘルプ：会話の内容（共通の興味・相手の最後のメッセージ）から返信を提案する
+    //   「別の提案を生成」を押すたびに別の3つ。トーン（カジュアル／丁寧／親しみやすい）でも変わる
+    // =====================================================================
+    const AI_PARTNER = <%= js(partner.getDisplayName()) %>;
+    const AI_TAGS = [<% for (int i = 0; i < commonTags.size(); i++) { %><%= i > 0 ? "," : "" %><%= js(commonTags.get(i)) %><% } %>];
+
+    const suggestionList = document.getElementById("aiSuggestionList");
+    const summaryList = document.getElementById("aiSummary");
+    const toneSelect = document.getElementById("aiTone");
+    const regenButton = document.getElementById("regenerateButton");
+    let lastShown = [];
+
+    // トーンごとの言い方（{tag} は共通の興味、{last} は相手の最後のメッセージの一部）
+    const AI_TEMPLATES = {
+        casual: {
+            tag: [
+                "{tag}好きなんだね！最近ハマってるのある？",
+                "{tag}の話もっと聞きたい！おすすめある？",
+                "{tag}って、いつから好きなの？",
+                "今度{tag}の話でゆっくり盛り上がろう！",
+                "{tag}だと、どんなのが一番好き？"
+            ],
+            reply: [
+                "「{last}」いいね！もうちょっと詳しく教えて！",
+                "それわかる！自分も「{last}」気になってた",
+                "「{last}」って、どういうところが好き？"
+            ],
+            question: [
+                "うーん、自分はまだ迷ってるかも。そっちはどう？",
+                "いい質問！ちょっと考えるね。先に教えて！"
+            ],
+            general: [
+                "今日のイベント、どこが一番楽しかった？",
+                "このイベントに来たきっかけって何？",
+                "休みの日って何してることが多い？",
+                "最近ハマってることある？",
+                "このあと会場で少し話せたらうれしいな！"
+            ]
+        },
+        polite: {
+            tag: [
+                "{tag}がお好きなんですね！最近のおすすめはありますか？",
+                "{tag}について、ぜひもう少しお話を聞かせてください。",
+                "{tag}はいつ頃からお好きなんですか？",
+                "{tag}の中で、特にお気に入りのものはありますか？"
+            ],
+            reply: [
+                "「{last}」とのこと、とても興味があります。詳しく教えていただけますか？",
+                "「{last}」、素敵ですね。どんなところが魅力ですか？"
+            ],
+            question: [
+                "ご質問ありがとうございます。少し考えてからお答えしますね。",
+                "私はまだ迷っているのですが、{name}さんはいかがですか？"
+            ],
+            general: [
+                "今日のイベントで印象に残ったことはありますか？",
+                "このイベントに参加されたきっかけは何ですか？",
+                "お休みの日はどのように過ごされていますか？",
+                "よろしければ、このあと会場で少しお話しできませんか？"
+            ]
+        },
+        friendly: {
+            tag: [
+                "{tag}好き仲間だね😊 最近のおすすめ教えて〜！",
+                "{tag}の話できる人いてうれしい！どんなのが好き？",
+                "{tag}つながりで仲良くなれそう！今度語ろう〜",
+                "{tag}のこと、もっと知りたいな✨"
+            ],
+            reply: [
+                "「{last}」めっちゃいいね！それでそれで？😊",
+                "「{last}」わかる〜！もっと聞かせて！"
+            ],
+            question: [
+                "えー迷う〜！そっちはどう思う？😊",
+                "いい質問！先に答え聞いてもいい？笑"
+            ],
+            general: [
+                "今日来てよかった〜！そっちは楽しめてる？",
+                "どうしてこのイベントに来たの？気になる〜",
+                "せっかくだから、あとで会場でもお話ししよう！😊",
+                "最近楽しかったこと教えて〜！"
+            ]
+        }
+    };
+
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    /** 今画面に出ているメッセージから、相手の最後のメッセージと件数を取る */
+    function readConversation() {
+        const others = document.querySelectorAll("#messageList .msg.other p");
+        const mine = document.querySelectorAll("#messageList .msg.me p");
+        const last = others.length ? others[others.length - 1].textContent.trim() : "";
+        return { last: last, otherCount: others.length, myCount: mine.length };
+    }
+
+    /** 候補をたくさん作って、前回と違う3つを選ぶ */
+    function buildSuggestions() {
+        const t = AI_TEMPLATES[toneSelect.value] || AI_TEMPLATES.casual;
+        const conv = readConversation();
+        const shortLast = conv.last.length > 14 ? conv.last.slice(0, 14) + "…" : conv.last;
+        const pool = [];
+
+        if (conv.last) {
+            const isQuestion = /[?？]$|か[?？]?$/.test(conv.last);
+            (isQuestion ? t.question : t.reply).forEach(function (x) {
+                pool.push({ text: x.replace("{last}", shortLast), kind: "reply" });
+            });
+        }
+        AI_TAGS.forEach(function (tag) {
+            t.tag.forEach(function (x) { pool.push({ text: x.split("{tag}").join(tag), kind: "tag" }); });
         });
+        t.general.forEach(function (x) { pool.push({ text: x, kind: "general" }); });
+
+        // 前回出したものは後回し
+        const fresh = shuffle(pool.filter(function (p) { return lastShown.indexOf(p.text) < 0; }));
+        const used = shuffle(pool.filter(function (p) { return lastShown.indexOf(p.text) >= 0; }));
+        const ordered = fresh.concat(used);
+
+        // できるだけ「返事・共通の興味・一般」をばらけさせる
+        const picked = [];
+        ["reply", "tag", "general"].forEach(function (k) {
+            const hit = ordered.find(function (p) { return p.kind === k && picked.indexOf(p) < 0; });
+            if (hit && picked.length < 3) picked.push(hit);
+        });
+        ordered.forEach(function (p) {
+            if (picked.length < 3 && picked.indexOf(p) < 0) picked.push(p);
+        });
+        return picked.map(function (p) { return p.text.split("{name}").join(AI_PARTNER); });
+    }
+
+    function renderSuggestions() {
+        const items = buildSuggestions();
+        lastShown = items;
+        suggestionList.innerHTML = "";
+        items.forEach(function (text) {
+            const card = document.createElement("div");
+            card.className = "suggestion-card";
+            const p = document.createElement("p");
+            p.textContent = text;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "copy-suggestion";
+            btn.textContent = "▢ コピー";
+            card.appendChild(p);
+            card.appendChild(btn);
+            suggestionList.appendChild(card);
+        });
+    }
+
+    function renderSummary() {
+        const conv = readConversation();
+        const lines = ["イベントで知り合った（" + AI_PARTNER + "さん）"];
+        lines.push(AI_TAGS.length
+                ? "共通の興味：" + AI_TAGS.join("・")
+                : "共通の興味はまだ見つかっていない");
+        lines.push("メッセージ：あなた " + conv.myCount + "件 ／ " + AI_PARTNER + "さん " + conv.otherCount + "件");
+        if (conv.last) {
+            lines.push("相手の最後のメッセージ：「" + (conv.last.length > 20 ? conv.last.slice(0, 20) + "…" : conv.last) + "」");
+        }
+        summaryList.innerHTML = "";
+        lines.forEach(function (text) {
+            const li = document.createElement("li");
+            li.textContent = text;
+            summaryList.appendChild(li);
+        });
+    }
+
+    /** 内蔵の提案（Gemini に繋がらないときの予備） */
+    function refreshLocal() {
+        renderSummary();
+        renderSuggestions();
+    }
+
+    // ---------- Gemini API（サーバーの /chat/ai 経由。API キーは画面に出さない） ----------
+    const AI_URL = "<%= ctx %>/chat/ai";
+    const aiNote = document.querySelector(".gemini-description");
+    const aiNoteDefault = aiNote ? aiNote.textContent : "";
+    let aiBusy = false;
+
+    function setNote(text) {
+        if (aiNote) aiNote.textContent = text;
+    }
+
+    function fillList(listEl, items, asCards) {
+        listEl.innerHTML = "";
+        items.forEach(function (text) {
+            if (!asCards) {
+                const li = document.createElement("li");
+                li.textContent = text;
+                listEl.appendChild(li);
+                return;
+            }
+            const card = document.createElement("div");
+            card.className = "suggestion-card";
+            const p = document.createElement("p");
+            p.textContent = text;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "copy-suggestion";
+            btn.textContent = "▢ コピー";
+            card.appendChild(p);
+            card.appendChild(btn);
+            listEl.appendChild(card);
+        });
+    }
+
+    /** Gemini の返事から {"summary":[…],"suggestions":[…]} を取り出す */
+    function parseGemini(data) {
+        const parts = (((data.candidates || [])[0] || {}).content || {}).parts || [];
+        const text = parts.filter(function (p) { return !p.thought && p.text; })
+                          .map(function (p) { return p.text; }).join("");
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
+        if (start < 0 || end <= start) throw new Error("JSON が見つかりません");
+        const obj = JSON.parse(text.slice(start, end + 1));
+        const clean = function (arr) {
+            return (Array.isArray(arr) ? arr : [])
+                .map(function (x) { return String(x).trim(); })
+                .filter(function (x) { return x.length > 0; })
+                .slice(0, 3);
+        };
+        const result = { summary: clean(obj.summary), suggestions: clean(obj.suggestions) };
+        if (result.suggestions.length === 0) throw new Error("提案が空です");
+        return result;
+    }
+
+    function refreshAi() {
+        if (aiBusy) return;
+        aiBusy = true;
+
+        const label = "↻ 別の提案を生成";
+        regenButton.disabled = true;
+        regenButton.textContent = "… Gemini が考え中";
+        suggestionList.style.opacity = "0.4";
+
+        const body = new URLSearchParams();
+        body.set("partnerId", "<%= partnerId %>");
+        body.set("tone", toneSelect.value);
+
+        fetch(AI_URL, { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.error) throw new Error(data.message || data.error);
+                const r = parseGemini(data);
+                if (r.summary.length) fillList(summaryList, r.summary, false);
+                fillList(suggestionList, r.suggestions, true);
+                lastShown = r.suggestions;
+                setNote(aiNoteDefault);
+            })
+            .catch(function (err) {
+                // キーが無い・通信できない など → 内蔵の提案を出す
+                console.log("[Gemini] 使えないので内蔵の提案にします：", err.message);
+                refreshLocal();
+                setNote("※ Gemini に接続できないため、簡易的な提案を表示しています。");
+            })
+            .then(function () {
+                suggestionList.style.opacity = "";
+                regenButton.textContent = label;
+                regenButton.disabled = false;
+                aiBusy = false;
+            });
+    }
+
+    regenButton.addEventListener("click", refreshAi);
+    toneSelect.addEventListener("change", refreshAi);
+
+    // 「コピー」：入力欄に入れる（自動では送らない）
+    suggestionList.addEventListener("click", function (e) {
+        const btn = e.target.closest(".copy-suggestion");
+        if (!btn) return;
+        input.value = btn.parentElement.querySelector("p").textContent.trim();
+        closeAi();
+        input.focus();
     });
+
+    refreshLocal();      // 最初は内蔵の提案（Gemini は AI パネルを開いたときに呼ぶ）
+
+    // ===== 交流申請のお知らせ：5秒ごとに状態を確認して、チャットの上に出す =====
+    const reqBanner = document.getElementById("requestBanner");
+    const reqText = document.getElementById("requestBannerText");
+    // 見送りのお知らせは、確認したら（帯を押したら）もう出さない
+    function seenDecline(id) {
+        try { return localStorage.getItem("c2r-decline-seen-" + id) === "1"; } catch (e) { return false; }
+    }
+    reqBanner.addEventListener("click", function () {
+        const id = reqBanner.dataset.declineId;
+        if (id && reqBanner.classList.contains("is-soft")) {
+            try { localStorage.setItem("c2r-decline-seen-" + id, "1"); } catch (e) {}
+        }
+    });
+
+    function checkRequest() {
+        if (document.hidden) return;
+        fetch("<%= ctx %>/interaction/request?partnerId=<%= partnerId %>&format=json",
+              { cache: "no-store", credentials: "same-origin" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (s) {
+                if (!s) return;
+                let text = "";
+                if (s.approved) {
+                    text = "相互承認が成立しました！合流しましょう";
+                    reqBanner.classList.add("is-match");
+                } else if (s.incoming) {
+                    text = AI_PARTNER + "さんから交流申請が届きました";
+                    reqBanner.classList.remove("is-match");
+                } else if (s.waiting) {
+                    text = "交流申請を送りました。返事を待っています";
+                    reqBanner.classList.remove("is-match");
+                } else if (s.declined && !seenDecline(s.exchangeRequestId)) {
+                    // 見送られたときは、責めない言い方で1回だけお知らせ（押すとお知らせ画面へ）
+                    text = "今回は見送りになりました。チャットはこのまま続けられます 🌱";
+                    reqBanner.classList.remove("is-match");
+                    reqBanner.classList.add("is-soft");
+                    reqBanner.dataset.declineId = s.exchangeRequestId;
+                }
+                if (!s.declined) reqBanner.classList.remove("is-soft");
+                reqText.textContent = text;
+                reqBanner.hidden = (text === "");
+            })
+            .catch(function () {});
+    }
+    checkRequest();
+    setInterval(checkRequest, 5000);
 
     // ===== AI パネル：最初は隠しておき、✨AI ボタンを押したときだけ右から出す =====
     const panel = document.getElementById("geminiPanel");
@@ -516,6 +846,7 @@
     window.addEventListener("resize", fitLayout);
 
     function openAi() {
+        refreshAi();                       // 開くたびに最新の会話で作り直す
         panel.classList.add("is-open");
         backdrop.classList.add("is-open");
         panel.setAttribute("aria-hidden", "false");

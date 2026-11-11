@@ -30,8 +30,11 @@
 
     if (partnerName == null) partnerName = "";
 
-    // 合流エリア（画面設計書 No.4 の選択肢）
-    String[] zones = { "入口付近", "ステージ前", "中央テーブル", "ドリンクコーナー" };
+    // 合流エリア・会場マップ（運営者がお知らせ配信画面で設定。無いときは初期の4エリア）
+    @SuppressWarnings("unchecked")
+    java.util.List<String> zones = (java.util.List<String>) request.getAttribute("zones");
+    if (zones == null) zones = java.util.List.of("入口付近", "ステージ前", "中央テーブル", "ドリンクコーナー");
+    String venueMapPath = (String) request.getAttribute("venueMapPath");
 
     String ctx = request.getContextPath();
 %>
@@ -41,7 +44,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>合流 | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/meetup.css">
+    <link rel="stylesheet" href="<%= ctx %>/css/meetup.css?v=3">
 </head>
 <body>
 
@@ -68,7 +71,7 @@
     <section class="partner-card">
         <div class="partner-photo">
 <% if (partnerPhoto != null) { %>
-            <img src="<%= h(partnerPhoto) %>" alt="<%= h(partnerName) %>さんの写真">
+            <img src="<%= ctx %><%= h(partnerPhoto) %>" alt="<%= h(partnerName) %>さんの写真">
 <% } else { %>
             <span><%= partnerName.isEmpty() ? "?" : h(partnerName.substring(0, 1)) %></span>
 <% } %>
@@ -99,7 +102,7 @@
             <select id="zone" name="zone" class="zone-select" required>
                 <option value="">選択してください</option>
 <% for (String zone : zones) { %>
-                <option value="<%= zone %>"<%= zone.equals(myZone) ? " selected" : "" %>><%= zone %></option>
+                <option value="<%= h(zone) %>"<%= zone.equals(myZone) ? " selected" : "" %>><%= h(zone) %></option>
 <% } %>
             </select>
 
@@ -114,12 +117,19 @@
     <!-- 6. 会場マップ（相手・自分のエリアに印を表示） -->
     <section class="map-panel">
         <p class="section-title">会場マップ</p>
+<% if (venueMapPath != null) { %>
+        <!-- 運営者が入れた会場の写真（押すと大きく表示） -->
+        <a class="venue-photo" href="<%= ctx %><%= h(venueMapPath) %>" target="_blank" rel="noopener">
+            <img src="<%= ctx %><%= h(venueMapPath) %>" alt="会場マップ">
+            <span class="venue-photo-zoom">タップで拡大 ↗</span>
+        </a>
+<% } %>
         <div class="venue-map">
 <% for (String zone : zones) {
        boolean isPartner = zone.equals(partnerZone);
        boolean isMine = zone.equals(myZone); %>
             <div class="map-zone<%= isPartner ? " has-partner" : "" %><%= isMine ? " has-me" : "" %>">
-                <span class="map-zone-name"><%= zone %></span>
+                <span class="map-zone-name"><%= h(zone) %></span>
 <% if (isPartner) { %>
                 <span class="map-pin partner"><%= h(partnerName) %>さん</span>
 <% } %>
@@ -137,18 +147,12 @@
     </p>
 
     <!-- 8. 交流結果を登録する -->
-<<<<<<< HEAD
-    <form action="<%= ctx %>/participants/meetResult.jsp" method="get">
-=======
     <form action="<%= ctx %>/participants/meetResult" method="get">
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
         <input type="hidden" name="exchangeRequestId" value="<%= h(exchangeRequestId) %>">
         <button type="submit" name="resultButton" class="result-button">交流結果を登録する</button>
     </form>
 
 </main>
-
-<%@ include file="/common/footer.jsp" %>
 
 <script>
     // 相手が合図を送ると表示が変わるように、15秒ごとに画面を更新する
@@ -163,5 +167,5 @@
     }, 15000);
 </script>
 
-</body>
-</html>
+<%-- 共通フッター（</body></html> もここで閉じる） --%>
+<%@ include file="/common/footer.jsp" %>

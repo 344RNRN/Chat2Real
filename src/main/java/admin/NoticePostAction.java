@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import Bean.NotificationBean;
+import DAO.MeetupZoneDAO;
 import DAO.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -56,6 +57,11 @@ public class NoticePostAction extends HttpServlet {
             request.setAttribute("notificationList", notificationList);
             request.setAttribute("eventId", eventId);
             request.setAttribute("eventName", event[0]);
+
+            // 会場マップ・合流エリア（参加者の合流画面に出る）
+            Object[] venue = new MeetupZoneDAO().findByEventId(eventId);
+            request.setAttribute("meetupZones", venue[0]);
+            request.setAttribute("venueMapPath", venue[1]);
 
         } catch (SQLException e) {
             throw new ServletException("お知らせ一覧の取得に失敗しました。", e);

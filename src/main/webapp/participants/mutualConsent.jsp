@@ -43,7 +43,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>相互承認 | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/participant-message.css">
+    <link rel="stylesheet" href="<%= ctx %>/css/participant-message.css?v=2">
 </head>
 <body>
 
@@ -77,7 +77,7 @@
         <div class="pair">
             <span class="avatar large me">
 <% if (myPhoto != null) { %>
-                <img src="<%= h(myPhoto) %>" alt="あなたの写真">
+                <img src="<%= ctx %><%= h(myPhoto) %>" alt="あなたの写真">
 <% } else { %>
                 <%= initial(myName) %>
 <% } %>
@@ -87,7 +87,7 @@
 
             <span class="avatar large partner">
 <% if (partnerPhoto != null) { %>
-                <img src="<%= h(partnerPhoto) %>" alt="<%= h(partnerName) %>さんの写真">
+                <img src="<%= ctx %><%= h(partnerPhoto) %>" alt="<%= h(partnerName) %>さんの写真">
 <% } else { %>
                 <%= initial(partnerName) %>
 <% } %>

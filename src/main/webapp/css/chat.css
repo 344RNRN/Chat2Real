@@ -1,3 +1,4 @@
+
 /* =========================================
    Chat2Real - Complete Chat Design
    ========================================= */
@@ -1283,6 +1284,69 @@ body.chat-screen .gemini-panel.ai-drawer.is-open {
 .ai-backdrop.is-open {
     opacity: 1;
     pointer-events: auto;
+}
+
+
+/* =========================================
+   交流申請のお知らせ（相手から届いた・相互承認が成立した）
+   ========================================= */
+
+.request-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    margin: 10px 14px 0;
+    padding: 11px 14px;
+
+    color: #7a2e52;
+    background: #fff0f6;
+    border: 1px solid #ffd0e1;
+    border-radius: 14px;
+
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+
+    animation: request-in .3s ease;
+}
+
+.request-banner[hidden] {
+    display: none;
+}
+
+.request-banner.is-match {
+    color: #1f6b4a;
+    background: #eefaf3;
+    border-color: #c9ecd8;
+}
+
+/* 申請が見送られたとき：やさしい色で */
+.request-banner.is-soft {
+    color: #4a5878;
+    background: #f3f5fb;
+    border-color: #dde3f0;
+}
+
+.request-banner-icon {
+    font-size: 18px;
+}
+
+.request-banner-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.request-banner-go {
+    flex-shrink: 0;
+    color: var(--primary-dark);
+    font-weight: 800;
+}
+
+@keyframes request-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: none; }
 }
 
 /* =========================================

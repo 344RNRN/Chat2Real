@@ -2,7 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets" %>
 <%@ page import="Bean.ParticipantListBean, Bean.InterestBean" %>
-<%@ include file="/common/chat-notify.jsp" %>
 <%!
     private static String h(Object value) {
         if (value == null) {
@@ -81,7 +80,7 @@
 
         <div class="heading-side">
             <div class="participant-count">
-                <span class="count-number"><%= list.getWantCount() %></span>
+                <span class="count-number" id="liveCount"><%= list.getWantCount() %></span>
                 <span class="count-label">交流したい参加者</span>
             </div>
 
@@ -96,6 +95,15 @@
                 <span aria-hidden="true">💬</span> チャット画面へ
             </button>
         <% } %>
+
+            <%-- 交流申請のお知らせ（押すと一覧が開く）。赤い丸は返事を待っている申請の数 --%>
+            <div class="request-wrap">
+                <button type="button" class="open-chat-button request-button" id="requestButton"
+                        aria-haspopup="true">
+                    <span aria-hidden="true">💌</span> 交流申請
+                    <span class="rn-badge" id="requestBadge" hidden>0</span>
+                </button>
+            </div>
         </div>
     </section>
 
@@ -174,10 +182,13 @@
     </section>
 
 
+    <!-- 新しい参加者が入ってきたときのお知らせ（自動更新） -->
+    <button type="button" class="live-toast" id="liveToast" hidden></button>
+
     <!-- Participant List -->
     <section class="participant-section">
 
-        <div class="list-heading">
+        <div class="list-heading" id="liveHeading">
             <h2><%= list.isFiltered() ? "検索結果" : "交流できる参加者" %></h2>
             <span class="list-description">
             <% if (list.isFiltered()) { %>
@@ -189,11 +200,11 @@
         </div>
 
 
-        <div class="participant-list">
+        <div class="participant-list" id="liveList">
 
         <% for (ParticipantListBean.Participant p : list.getParticipants()) {
                String profileUrl = ctx + "/participant/AccountProfile.action?id=" + p.getEventParticipantId(); %>
-            <article class="participant-card">
+            <article class="participant-card" data-id="<%= p.getEventParticipantId() %>">
 
                 <!-- アイコン・名前・興味・一言（押すとプロフィール） -->
                 <a href="<%= profileUrl %>" class="participant-link" aria-label="<%= h(p.getNickname()) %>さんのプロフィールを見る">
@@ -248,7 +259,7 @@
 
 
         <!-- Empty State -->
-        <div class="empty-message" <%= list.getParticipants().isEmpty() ? "" : "hidden" %>>
+        <div class="empty-message" id="liveEmpty" <%= list.getParticipants().isEmpty() ? "" : "hidden" %>>
             <div class="empty-icon">⌕</div>
         <% if (list.isFiltered()) { %>
             <h3>参加者が見つかりません</h3>
@@ -260,12 +271,14 @@
         </div>
 
 
+        <div id="liveFooter">
     <% if (list.getOtherCount() > 0) { %>
         <div class="list-footer">
             <p>ほかにも交流できる参加者が <%= list.getOtherCount() %> 名います</p>
             <a href="<%= h(showAllUrl) %>" class="show-all-link">すべて表示する</a>
         </div>
     <% } %>
+        </div>
 
     </section>
 
@@ -295,7 +308,154 @@
 
 </main>
 
+<style>
+    /* 「交流申請」ボタン（チャット画面へ の下） */
+    .request-wrap {
+        position: relative;
+        display: flex;
+    }
+    .request-wrap .request-button {
+        flex: 1;
+        border-color: #c9d6ea;
+        color: #173b63 !important;
+    }
+    .request-wrap .request-button:hover {
+        background: #f4f7fc;
+    }
+    @media (max-width: 700px) {
+        /* スマホ：人数・チャット画面へ の下に横いっぱいで */
+        .heading-side { flex-wrap: wrap; }
+        .request-wrap { flex-basis: 100%; }
+        .request-wrap .request-button { border-radius: 18px; }
+    }
+
+    /* 新しい参加者のお知らせ */
+    .live-toast {
+        position: fixed;
+        top: 14px;
+        left: 50%;
+        z-index: 900;
+        transform: translate(-50%, -12px);
+        opacity: 0;
+
+        padding: 10px 18px;
+        color: #ffffff;
+        background: #173b63;
+        border: none;
+        border-radius: 999px;
+        box-shadow: 0 8px 22px rgba(23, 59, 99, 0.28);
+
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+        pointer-events: none;
+        transition: opacity 0.25s, transform 0.25s;
+    }
+    .live-toast.is-show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate(-50%, 0);
+    }
+    /* 新しく入ってきた人のカードを少し光らせる */
+    .participant-card.is-new {
+        animation: live-new 2.4s ease-out;
+    }
+    @keyframes live-new {
+        0%   { box-shadow: 0 0 0 3px rgba(244, 91, 145, 0.55); }
+        100% { box-shadow: 0 0 0 3px rgba(244, 91, 145, 0); }
+    }
+</style>
+
 <script>
+    // ===== 参加者一覧の自動更新 =====
+    // 15秒ごとに同じ条件で一覧を取り直し、変わっていたら一覧の部分だけ入れ替える（画面の再読み込みはしない）
+    (function () {
+        var INTERVAL = 15000;
+        var toast = document.getElementById("liveToast");
+        var toastTimer = null;
+
+        function ids(root) {
+            return Array.prototype.map.call(root.querySelectorAll(".participant-card[data-id]"),
+                function (el) { return el.getAttribute("data-id"); });
+        }
+
+        function showToast(text) {
+            toast.textContent = text;
+            toast.hidden = false;
+            requestAnimationFrame(function () { toast.classList.add("is-show"); });
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.classList.remove("is-show"); }, 5000);
+        }
+        toast.addEventListener("click", function () {
+            toast.classList.remove("is-show");
+            document.getElementById("liveHeading").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        function replace(id, doc) {
+            var now = document.getElementById(id);
+            var next = doc.getElementById(id);
+            if (now && next) now.replaceWith(next);
+        }
+
+        function refresh() {
+            if (document.hidden) return;
+            // 検索欄に入力中のときは更新しない
+            if (document.activeElement && document.activeElement.id === "participantName") return;
+
+            fetch(location.href, { cache: "no-store", credentials: "same-origin" })
+                .then(function (r) { return (r.ok && !r.redirected) ? r.text() : null; })
+                .then(function (html) {
+                    if (!html) return;
+                    var doc = new DOMParser().parseFromString(html, "text/html");
+                    var nextList = doc.getElementById("liveList");
+                    if (!nextList) return;
+
+                    var before = ids(document);
+                    var after = ids(doc);
+                    var countNow = document.getElementById("liveCount");
+                    var countNext = doc.getElementById("liveCount");
+                    var sameCount = !countNow || !countNext || countNow.textContent === countNext.textContent;
+                    if (before.join(",") === after.join(",") && sameCount) return;   // 変化なし
+
+                    // 未読バッジの今の表示を引き継ぐ（次の通知チェックまで消えないように）
+                    var badges = {};
+                    document.querySelectorAll("#liveList [data-unread-partner]").forEach(function (b) {
+                        badges[b.getAttribute("data-unread-partner")] = { hidden: b.hidden, text: b.textContent };
+                    });
+
+                    replace("liveList", doc);
+                    replace("liveHeading", doc);
+                    replace("liveEmpty", doc);
+                    replace("liveFooter", doc);
+                    if (countNow && countNext) countNow.textContent = countNext.textContent;
+
+                    document.querySelectorAll("#liveList [data-unread-partner]").forEach(function (b) {
+                        var old = badges[b.getAttribute("data-unread-partner")];
+                        if (old) { b.hidden = old.hidden; b.textContent = old.text; }
+                    });
+
+                    // 新しく入ってきた人
+                    var added = after.filter(function (id) { return before.indexOf(id) < 0; });
+                    added.forEach(function (id) {
+                        var card = document.querySelector('#liveList .participant-card[data-id="' + id + '"]');
+                        if (card) card.classList.add("is-new");
+                    });
+                    if (added.length > 0) {
+                        showToast("👋 新しい参加者が" + added.length + "人入りました");
+                    }
+                })
+                .catch(function () { /* 通信できないときは次の回に */ });
+        }
+
+        setInterval(refresh, INTERVAL);
+        // ほかのアプリから戻ってきたときもすぐ確認
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) refresh();
+        });
+    })();
+
     // 年代・趣味を選んだらすぐに絞り込む
     document.querySelectorAll("#searchForm .filter-select").forEach(function (select) {
         select.addEventListener("change", function () {
@@ -303,6 +463,12 @@
         });
     });
 </script>
+
+<%-- 交流申請のお知らせ（申請が届いた・相互承認が成立した など） --%>
+<%@ include file="/common/request-notify.jsp" %>
+
+<%-- 新着メッセージ通知（未読バッジ）※ <!DOCTYPE> より前に置くと画面が崩れるので、ここに置く --%>
+<%@ include file="/common/chat-notify.jsp" %>
 
 <%-- 共通フッター（</body></html> もここで閉じる） --%>
 <%@ include file="/common/footer.jsp" %>
