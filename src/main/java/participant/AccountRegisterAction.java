@@ -82,6 +82,17 @@ public class AccountRegisterAction extends HttpServlet {
             forwardToForm(request, response, bean, error);
             return;
         }
+        
+        // ---------- 1-2. 同じニックネームはこのイベントで1人だけ ----------
+        try {
+            if (new AccountRegisterDAO().existsNickname(bean.getEventId(), bean.getNickname())) {
+                forwardToForm(request, response, bean,
+                        "「" + bean.getNickname() + "」は、このイベントですでに使われています。別のニックネームにしてください");
+                return;
+            }
+        } catch (SQLException e) {
+            throw new ServletException("ニックネームを確認できませんでした", e);
+        }
 
         // ---------- 2. プロフィール写真（任意） ----------
         File savedPhoto = null;

@@ -203,4 +203,36 @@ public class AccountRegisterDAO {
         i.setActive(rs.getBoolean("is_active"));
         return i;
     }
+    
+    /**
+     * このイベントで、同じニックネームがもう使われているか
+     *   ・前後の空白、大文字／小文字、全角／半角の違いは同じとみなす（「Mio」「mio」「ｍｉｏ」は同じ）
+     */
+    public boolean existsNickname(long eventId, String nickname) throws SQLException {
+        String target = normalizeNickname(nickname);
+        String sql = "SELECT p.nickname "
+                   + "FROM public.t006_events_participant ep "
+                   + "JOIN public.t007_profiles p ON p.profile_id = ep.profile_id "
+                   + "WHERE ep.event_id = ?";
+        try (Connection con = DBManager.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, eventId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    if (target.equals(normalizeNickname(rs.getString(1)))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 比べるための形にする（全角→半角・小文字・前後の空白なし） */
+    private static String normalizeNickname(String s) {
+        if (s == null) return "";
+        return java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFKC)
+                .strip()
+                .toLowerCase(java.util.Locale.ROOT);
+    }
 }
