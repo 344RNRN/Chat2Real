@@ -166,32 +166,68 @@ public class ChatAction extends HttpServlet {
      * 自動更新用：メッセージ一覧の HTML（chat.jsp の #messageList の中身と同じ形）を返す。
      * チャットが終了していたら X-Chat-Ended ヘッダーを付ける（画面側で終了画面へ移動する）
      */
-    private void writeMessages(HttpServletResponse resp, Ctx c) throws IOException {
-        resp.setContentType("text/html; charset=UTF-8");
-        resp.setHeader("Cache-Control", "no-store");
 
-        if (c.ended()) {
-            resp.setHeader("X-Chat-Ended", "1");
-            return;
-        }
+private void writeMessages(HttpServletResponse resp, Ctx c) throws IOException {
+    resp.setContentType("text/html; charset=UTF-8");
+    resp.setHeader("Cache-Control", "no-store");
 
-        List<ChatMessageBean> messages;
-        try {
-            messages = dao.findMessages(c.chat.getChatId(), c.me.getParticipantId());
-        } catch (SQLException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
-        StringBuilder html = new StringBuilder();
-        for (ChatMessageBean m : messages) {
-            html.append("<div class=\"msg ").append(m.isMine() ? "me" : "other").append("\">")
-                .append("<p>").append(escape(m.getText())).append("</p>")
-                .append("<span class=\"meta\">").append(escape(m.getTime())).append("</span>")
-                .append("</div>\n");
-        }
-        resp.getWriter().write(html.toString());
+    if (c.ended()) {
+        resp.setHeader("X-Chat-Ended", "1");
+        return;
     }
+
+    List<ChatMessageBean> messages;
+    try {
+        messages = dao.findMessages(c.chat.getChatId(), c.me.getParticipantId());
+    } catch (SQLException e) {
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return;
+    }
+
+    StringBuilder html = new StringBuilder();
+
+    for (ChatMessageBean m : messages) {
+
+        html.append("<div class=\"msg ")
+            .append(m.isMine() ? "me" : "other")
+            .append("\" data-message-id=\"")
+            .append(m.getMessageId())
+            .append("\" data-chat-id=\"")
+            .append(c.chat.getChatId())
+            .append("\">");
+
+        // 元のメッセージ
+        html.append("<p class=\"message-text\">")
+            .append(escape(m.getText()))
+            .append("</p>");
+
+
+        if (!m.isMine()) {
+            html.append("<p class=\"translation-result\" hidden></p>");
+        }
+
+        html.append("<div class=\"message-footer\">");
+
+        if (!m.isMine()) {
+            html.append("<button type=\"button\" ")
+                .append("class=\"translate-button\" ")
+                .append("data-message-id=\"")
+                .append(m.getMessageId())
+                .append("\">翻訳</button>");
+        }
+
+        html.append("<span class=\"meta\">")
+            .append(escape(m.getTime()))
+            .append("</span>");
+
+        html.append("</div>");
+
+        html.append("</div>\n");
+    }
+
+    resp.getWriter().write(html.toString());
+}
+
 
     private static String escape(String s) {
         if (s == null) {

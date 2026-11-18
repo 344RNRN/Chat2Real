@@ -206,6 +206,56 @@ public class ChatDAO {
 
         return list;
     }
+    
+    
+
+    // =====================================
+    // 翻訳対象のメッセージを取得（相手から届いたものだけ）
+    // =====================================
+
+    public String findIncomingMessageText(
+            long chatId,
+            long messageId,
+            long myEventParticipantId) throws SQLException {
+
+        String sql =
+            "SELECT m.message_text " +
+            "FROM t011_messages m " +
+            "JOIN t010_chats c ON c.chat_id = m.chat_id " +
+            "JOIN t014_chat_participants mine " +
+            "  ON mine.chat_id = c.chat_id " +
+            "JOIN t006_events_participant me " +
+            "  ON me.event_participant_id = mine.event_participant_id " +
+            "JOIN t014_chat_participants other " +
+            "  ON other.chat_id = c.chat_id " +
+            " AND other.event_participant_id <> mine.event_participant_id " +
+            "JOIN t006_events_participant sender " +
+            "  ON sender.event_participant_id = other.event_participant_id " +
+            " AND sender.participant_id = m.sender_participant_id " +
+            "WHERE m.message_id = ? " +
+            "  AND m.chat_id = ? " +
+            "  AND mine.event_participant_id = ? " +
+            "  AND c.chat_type = '個人' " +
+            "  AND c.chat_status = '利用中' " +
+            "LIMIT 1";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setLong(1, messageId);
+            ps.setLong(2, chatId);
+            ps.setLong(3, myEventParticipantId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("message_text");
+                }
+            }
+        }
+
+        return null;
+    }
+
 
     // =====================================
     // 4. Insert message（個人チャット：利用中で、メンバーのときだけ）

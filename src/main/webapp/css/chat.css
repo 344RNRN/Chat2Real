@@ -1426,20 +1426,19 @@ body.chat-screen .gemini-panel.ai-drawer.is-open {
    ヘッダー → 相手 → メッセージ（ここだけスクロール）→ 入力欄 を画面の高さぴったりに
    ========================================= */
 
-@media screen and (max-width: 900px) {
-
     /* 見えている部分（Safari のツールバー・キーボードを除いた高さ）にぴったり固定する
        --app-h / --app-top は chat.jsp の JavaScript が入れる */
-    body.chat-screen {
-        position: fixed;
-        top: var(--app-top, 0px);
-        left: 0;
-        right: 0;
 
-        height: 100dvh;
-        height: var(--app-h, 100dvh);
+@media screen and (max-width: 900px) {
 
-        background: var(--chat-background);
+    body.chat-screen .chat-send {
+        flex: 0 0 auto;
+        min-height: 0;
+
+        padding: 10px 12px
+            calc(12px + env(safe-area-inset-bottom, 0px));
+
+        background: white;
     }
 
     /* サイトのヘッダーは1行にして小さく */
@@ -1763,4 +1762,60 @@ body:not(.chat-screen) {
 
 .back-button:hover {
     background-color: #e8f1fc;
+}
+
+.message-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+/* =========================================
+   個人チャット：翻訳ボタン
+   ========================================= */
+
+body.chat-screen .msg .message-footer .translate-button {
+    display: inline-block !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 2px 0 !important;
+
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    color: var(--primary) !important;
+
+    font-family: inherit !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+body.chat-screen .msg .message-footer .translate-button:hover {
+    color: var(--primary-dark) !important;
+    background: transparent !important;
+}
+
+body.chat-screen .msg .message-footer .translate-button:disabled {
+    opacity: 0.5;
+    cursor: wait;
 }

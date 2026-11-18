@@ -79,7 +79,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <title>チャット | Chat2Real</title>
-    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=11">
+    <link rel="stylesheet" href="<%= ctx %>/css/chat.css?v=12">
 </head>
 <body class="chat-screen">
 
@@ -278,10 +278,35 @@
         <% } %>
 
             <div id="messageList">
-            <% for (ChatMessageBean m : messages) { %>
-                <div class="msg <%= m.isMine() ? "me" : "other" %>"><p><%= h(m.getText()) %></p><span class="meta"><%= h(m.getTime()) %></span></div>
-            <% } %>
-            </div>
+				<% for (ChatMessageBean m : messages) { %>
+    			<div class="msg <%= m.isMine() ? "me" : "other" %>"
+         			data-message-id="<%= m.getMessageId() %>"
+         			data-chat-id="<%= chatId == null ? 0 : chatId %>">
+
+        			<!-- 元のメッセージ -->
+					<p class="message-text"><%= h(m.getText()) %></p>
+
+					<!-- 相手から届いたメッセージだけ翻訳結果の表示欄を用意 -->
+					<% if (!m.isMine()) { %>
+    					<p class="translation-result" hidden></p>
+					<% } %>
+
+					<!-- 時刻と翻訳ボタン -->
+					<div class="message-footer">
+
+    					<% if (!m.isMine()) { %>
+        					<button type="button"
+                				class="translate-button"
+                				data-message-id="<%= m.getMessageId() %>">
+            					翻訳
+        					</button>
+    					<% } %>
+
+    					<span class="meta"><%= h(m.getTime()) %></span>
+    				</div>
+    			</div>
+				<% } %>
+			</div>
 
             <!-- COMMON INTERESTS -->
         <% if (!commonTags.isEmpty()) { %>
@@ -393,6 +418,126 @@
     const input = document.getElementById("message");
     const form = document.getElementById("sendForm");
 
+
+ // ===== メッセージ翻訳機能 =====
+ const TRANSLATE_URL = "<%= ctx %>/chat/translate";
+
+//翻訳結果と現在の表示状態を一時保存
+ const translationCache = {};
+ const translationDisplayState = {};
+
+ // 翻訳ボタンを押したときの処理
+ list.addEventListener("click", function (e) {
+     const button = e.target.closest(".translate-button");
+     if (!button) return;
+
+     const messageId = button.dataset.messageId;
+     const message = button.closest(".msg");
+     if (!message || !messageId) return;
+
+     const original = message.querySelector(".message-text");
+     const result = message.querySelector(".translation-result");
+
+     if (!original || !result) return;
+
+     if (translationCache[messageId]) {
+    	    const showingTranslation = !result.hidden;
+
+    	    result.hidden = showingTranslation;
+    	    original.hidden = !showingTranslation;
+
+    	    // 表示状態を保存
+    	    translationDisplayState[messageId] = !showingTranslation;
+
+    	    button.textContent = showingTranslation ? "翻訳" : "原文に戻す";
+    	    return;
+    	}
+
+     button.disabled = true;
+     button.textContent = "翻訳中...";
+
+     const params = new URLSearchParams();
+     params.set("chatId", message.dataset.chatId);
+     params.set("messageId", messageId);
+
+     fetch(TRANSLATE_URL, {
+         method: "POST",
+         headers: {
+             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+         },
+         body: params.toString(),
+         credentials: "same-origin"
+     })
+     .then(function (response) {
+    return response.text().then(function (text) {
+
+        console.log("翻訳APIステータス:", response.status);
+        console.log("翻訳APIレスポンス:", text);
+
+        if (!text.trim()) {
+            throw new Error("サーバーから空の応答が返されました。");
+        }
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            throw new Error("サーバーの応答がJSON形式ではありません。");
+        }
+
+        if (!response.ok || data.error) {
+            throw new Error(data.message || data.error || "翻訳に失敗しました");
+        }
+
+        return data;
+    });
+})
+     .then(function (data) {
+    	 translationCache[messageId] = data.translatedText;
+    	 translationDisplayState[messageId] = true;
+
+    	 result.textContent = data.translatedText;
+    	 result.hidden = false;
+    	 original.hidden = true;
+    	 button.textContent = "原文に戻す";
+     })
+     .catch(function (error) {
+         alert(error.message || "翻訳に失敗しました");
+         button.textContent = "翻訳";
+     })
+     .finally(function () {
+         button.disabled = false;
+     });
+ });
+
+ // 自動更新でメッセージ一覧が再描画されたとき、翻訳状態を復元する
+ function restoreTranslations() {
+    list.querySelectorAll(".msg.other").forEach(function (message) {
+        const messageId = message.dataset.messageId;
+
+        if (!messageId || !translationCache[messageId]) return;
+
+        const original = message.querySelector(".message-text");
+        const result = message.querySelector(".translation-result");
+        const button = message.querySelector(".translate-button");
+
+        if (!original || !result || !button) return;
+
+        result.textContent = translationCache[messageId];
+
+        const showingTranslation =
+            translationDisplayState[messageId] !== false;
+
+        result.hidden = !showingTranslation;
+        original.hidden = showingTranslation;
+
+        button.textContent =
+            showingTranslation ? "原文に戻す" : "翻訳";
+    });
+}
+     
+
     function scrollBottom() {
         body.scrollTop = body.scrollHeight;
     }
@@ -415,21 +560,25 @@
 
     // iPhone の下に浮いているツールバー（＜・共有・更新）に入力欄が隠れるときだけ、ここを 70 くらいにする
     // （ふつうは 0 のままでよい：見えている高さに合わせているので、ツールバーの上で止まる）
-<<<<<<< HEAD
-    const IOS_TOOLBAR_SPACE = 200;
-=======
-    const IOS_TOOLBAR_SPACE = 120;
->>>>>>> branch 'main' of https://github.com/344RNRN/Chat2Real.git
+    const IOS_TOOLBAR_SPACE = 0;
+
 
     const chatLayoutEl = document.querySelector(".chat-layout");
     const chatMainEl = document.querySelector(".chat-main");
     const siteHeaderEl = document.querySelector("body.chat-screen > header, body.chat-screen .header");
 
     function fitViewport() {
+    	// 現在見えている画面の高さと上端
         const h = vv ? vv.height : window.innerHeight;
         const top = vv ? vv.offsetTop : 0;
+
+        // 画面下端に残っている見えない領域
+        const layoutHeight = window.innerHeight;
+        const bottom = Math.max(0, layoutHeight - top - h);
+
         root.style.setProperty("--app-h", h + "px");
         root.style.setProperty("--app-top", top + "px");
+        root.style.setProperty("--app-bottom", bottom + "px");
 
         // キーボードが出ている（見えている高さが大きく減った）ときは、ツールバー分の余白はいらない
         fullHeight = Math.max(fullHeight, window.innerHeight);
@@ -446,7 +595,9 @@
             b.left = "0";
             b.right = "0";
             b.top = top + "px";
+            b.bottom = "auto";
             b.height = h + "px";
+            b.minHeight = "0";
             b.display = "flex";
             b.flexDirection = "column";
             b.overflow = "hidden";
@@ -468,10 +619,9 @@
             m.minHeight = "0";
 
             sendBar.style.flexShrink = "0";
-            sendBar.style.paddingBottom = (IOS_TOOLBAR_SPACE > 0 && isIOS && !keyboard)
-                    ? IOS_TOOLBAR_SPACE + "px" : "";
+            sendBar.style.paddingBottom = "";
         } else {
-            ["position", "left", "right", "top", "height", "display", "flexDirection", "overflow"]
+            ["position", "left", "right", "top","bottom", "height", "display", "flexDirection", "overflow"]
                 .forEach(function (k) { b[k] = ""; });
             ["display", "flexDirection", "flex", "height", "minHeight", "padding", "gap"]
                 .forEach(function (k) { l[k] = ""; });
@@ -600,8 +750,8 @@
 
     /** 今画面に出ているメッセージから、相手の最後のメッセージと件数を取る */
     function readConversation() {
-        const others = document.querySelectorAll("#messageList .msg.other p");
-        const mine = document.querySelectorAll("#messageList .msg.me p");
+    	const others = document.querySelectorAll("#messageList .msg.other .message-text");
+        const mine = document.querySelectorAll("#messageList .msg.me .message-text");
         const last = others.length ? others[others.length - 1].textContent.trim() : "";
         return { last: last, otherCount: others.length, myCount: mine.length };
     }
@@ -943,6 +1093,10 @@
 
             if (list.innerHTML.trim() !== html.trim()) {
                 list.innerHTML = html;
+
+                // 保存している翻訳結果を新しいメッセージ一覧に復元
+                restoreTranslations();
+
                 if (nearBottom) scrollBottom();
             }
         })
